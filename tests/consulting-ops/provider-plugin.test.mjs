@@ -16,5 +16,6 @@ test('loads a local provider plugin and uses it during discovery', async () => {
   const pipelinePath = join(root, 'pipeline.md');
   const result = await scan({ sources: [{ id: 'fixture-source', type: 'fixture', title: 'Leadership RFP', url: 'https://example.test/rfp' }] }, { pipelinePath, providers });
   assert.equal(result.found.length, 1);
+  assert.equal(result.stats.actionable, 1);
   assert.match(readFileSync(pipelinePath, 'utf8'), /Leadership RFP/);
 });

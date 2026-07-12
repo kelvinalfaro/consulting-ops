@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { checkLiveness, deduplicateTracker, findTracker, inboxSummary, qualityCheck, reconcilePipeline, verifyTracker } from '../../operational-tools.mjs';
+import { checkLiveness, deduplicateTracker, findTracker, inboxSummary, qualityCheck, reconcilePipeline, scanRunSummary, verifyTracker } from '../../operational-tools.mjs';
 
 const valid = { '#': '1', issuer: 'Agency', opportunity: 'Planning RFP', status: 'Bid', notes: 'RFP-1', due: '', next_action: '' };
 
@@ -17,7 +17,7 @@ test('verifies, finds, and deduplicates tracker rows', () => {
 });
 
 test('reconciles pipeline URLs and summarizes inbox work', () => {
-  const pipeline = '# Pipeline\n- [ ] https://example.test/one\n- [ ] https://example.test/two\n';
+  const pipeline = '# Pipeline\n## Pending\n- [ ] https://example.test/one\n- [ ] https://example.test/two\n## Source leads\n- [ ] https://example.test/portal\n';
   const result = reconcilePipeline(pipeline, [{ path: 'one.yml', value: { source_url: 'https://example.test/one' } }]);
   assert.deepEqual(result.captured, ['https://example.test/one']);
   assert.deepEqual(result.pending, ['https://example.test/two']);
@@ -40,4 +40,13 @@ test('liveness reports provider responses and non-HTTP records', async () => {
   const results = await checkLiveness(records, async () => ({ ok: true, status: 200 }));
   assert.equal(results[0].status, 'live');
   assert.equal(results[1].status, 'not-checkable');
+});
+
+test('scan run summary separates partial runs and computes completed-run quality', () => {
+  const tsv = 'timestamp\tstatus\tscanned\tactionable\tsource_leads\trejected\tduplicates\terrors\n2026-07-12\tcompleted\t10\t2\t1\t6\t1\t0\n2026-07-13\tpartial\t5\t0\t0\t4\t0\t1\n';
+  const result = scanRunSummary(tsv);
+  assert.equal(result.runs, 2);
+  assert.equal(result.partial_runs, 1);
+  assert.equal(result.total_actionable, 2);
+  assert.equal(result.average_rejection_rate, 60);
 });

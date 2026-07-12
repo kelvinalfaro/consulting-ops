@@ -6,7 +6,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
-import { existingUrls } from './scan-rfps.mjs';
+import { pendingItems, pendingUrls } from './process-pipeline.mjs';
 import { readTracker, writeTracker, normalizeState, setTrackedStatus, upsertOpportunity } from './lib/tracker-store.mjs';
 import { trackerMetrics } from './lib/rfp-tracker.mjs';
 
@@ -66,7 +66,7 @@ function opportunityRecords(root = 'data/opportunities') {
 }
 
 export function reconcilePipeline(pipeline, records) {
-  const pending = [...existingUrls(pipeline)];
+  const pending = pendingUrls(pipeline);
   const captured = new Set(records.map(({ value }) => value.source_url).filter(Boolean));
   return { pending: pending.filter((url) => !captured.has(url)), captured: pending.filter((url) => captured.has(url)), orphan_records: records.filter(({ value }) => value.source_url && !pending.includes(value.source_url)).map(({ path }) => path) };
 }
@@ -91,7 +91,18 @@ export function inboxSummary(pipeline, rows) {
     const due = Date.parse(row.due);
     return Number.isFinite(due) && due >= now && due - now <= 7 * 86400000;
   });
-  return { unchecked_sources: (pipeline.match(/^- \[ \] /gm) ?? []).length, active: active.length, urgent, missing_next_action: active.filter((row) => !row.next_action) };
+  return { unchecked_sources: pendingItems(pipeline).length, active: active.length, urgent, missing_next_action: active.filter((row) => !row.next_action) };
+}
+
+export function scanRunSummary(tsv = '') {
+  const lines = tsv.trim().split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) return null;
+  const headers = lines[0].split('\t');
+  const records = lines.slice(1).map((line) => Object.fromEntries(headers.map((header, index) => [header, line.split('\t')[index] ?? '']))).filter((row) => row.timestamp && row.status);
+  if (!records.length) return null;
+  const completed = records.filter((row) => row.status === 'completed');
+  const sum = (field) => completed.reduce((total, row) => total + (Number(row[field]) || 0), 0);
+  return { runs: records.length, partial_runs: records.filter((row) => row.status === 'partial').length, last_run: records.at(-1), total_actionable: sum('actionable'), total_source_leads: sum('source_leads'), average_rejection_rate: completed.length && sum('scanned') ? Math.round(sum('rejected') / sum('scanned') * 1000) / 10 : null };
 }
 
 export function qualityCheck(workspace) {
@@ -110,7 +121,10 @@ async function run(command, args) {
   if (command === 'verify') { const failures = verifyTracker(rows); return { status: failures.length ? 'failed' : 'passed', failures }; }
   if (command === 'normalize') { const normalized = normalizeTracker(rows); writeTracker(normalized, trackerPath); return { normalized: normalized.length }; }
   if (command === 'dedup') { const result = deduplicateTracker(rows); if (!args.includes('--dry-run')) writeTracker(result.rows, trackerPath); return { ...result, rows: result.rows.length, dry_run: args.includes('--dry-run') }; }
-  if (command === 'stats') return { metrics: trackerMetrics(rows), statuses: Object.fromEntries([...new Set(rows.map((r) => r.status))].map((status) => [status, rows.filter((r) => r.status === status).length])) };
+  if (command === 'stats') {
+    const runsPath = resolve('data/scan-runs.tsv');
+    return { metrics: trackerMetrics(rows), statuses: Object.fromEntries([...new Set(rows.map((r) => r.status))].map((status) => [status, rows.filter((r) => r.status === status).length])), scan_runs: scanRunSummary(existsSync(runsPath) ? readFileSync(runsPath, 'utf8') : '') };
+  }
   if (command === 'find') return { query: args.join(' '), rows: findTracker(rows, args.join(' ')) };
   if (command === 'add') return upsertOpportunity(structured(resolve(args[0])), {}, trackerPath);
   if (command === 'status') return setTrackedStatus(args[0], args.slice(1).join(' '), trackerPath);

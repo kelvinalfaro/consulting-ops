@@ -17,6 +17,13 @@ sources:
     type: manual
     enabled: true
     label: "Manual opportunity inbox"
+  - id: example-official-procurement-page
+    type: html_links
+    enabled: false
+    label: "Example official procurement office"
+    url: "https://example.gov/procurement/opportunities"
+    link_include_terms: ["RFP", "RFQ", "consultant", "strategic planning", "facilitation", "coaching"]
+    link_exclude_terms: ["construction", "engineering"]
 
 filters:
   include_terms: ["consulting", "coaching", "facilitation"]
