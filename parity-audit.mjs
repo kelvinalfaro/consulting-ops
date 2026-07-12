@@ -15,6 +15,7 @@ const requiredFiles = [
   'dashboard-server.mjs', 'update-system.mjs', 'release-audit.mjs', 'ARCHITECTURE.md',
   'DATA_CONTRACT.md', 'PARITY.md', 'README.md', 'AGENTS.md', 'templates/states.yml', 'providers/_registry.mjs',
   'FLOW_PARITY.json',
+  'lib/command-center.mjs',
   'operational-tools.mjs', 'plugin-manager.mjs', 'agent-inbox.mjs', 'growth-assessment.mjs', 'submission-field-pack.mjs', 'evidence-intake.mjs', 'migrate-career-ops.mjs',
   'test-all.mjs',
   'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'GOVERNANCE.md', 'MAINTAINERS.md', 'SUPPORT.md',
@@ -35,13 +36,6 @@ const routedModeFiles = [
   'submission', 'apply', 'agent-inbox', 'letter', 'finalist-plan', 'finalist-practice',
   'finalist-debrief', 'training', 'service', 'adjacent', 'jurisdiction', 'evidence-add', 'tracker',
 ];
-const commandCenterModes = [
-  'scan', 'pipeline', 'evaluate', 'proposal', 'compare', 'research', 'contact', 'email',
-  'evidence', 'evidence-add', 'letter', 'amend', 'apply', 'submission', 'export', 'finalist', 'finalist-plan',
-  'finalist-practice', 'finalist-debrief', 'contract', 'tracker', 'inbox', 'agent-inbox',
-  'deadlines', 'followup', 'debrief', 'patterns', 'training', 'service', 'adjacent', 'jurisdiction', 'dashboard', 'doctor', 'update',
-];
-
 export function auditParity(root = '.') {
   const failures = [];
   for (const path of requiredFiles) if (!existsSync(resolve(root, path))) failures.push(`missing file: ${path}`);
@@ -50,8 +44,10 @@ export function auditParity(root = '.') {
     if (!existsSync(resolve(root, path))) failures.push(`missing adapter: ${path}`);
   }
   const canonicalSkill = readFileSync(resolve(root, '.agents/skills/consulting-ops/SKILL.md'), 'utf8');
-  if (!canonicalSkill.includes('## Command center (no arguments)')) failures.push('canonical skill lacks full command center');
-  for (const mode of commandCenterModes) if (!canonicalSkill.includes(`- ${mode} `)) failures.push(`canonical command center lacks ${mode}`);
+  if (!canonicalSkill.includes('run exactly `node consulting-ops.mjs`')) failures.push('canonical skill lacks deterministic command-center route');
+  if (canonicalSkill.includes('npx consulting-ops')) failures.push('canonical skill uses npx instead of the source router');
+  const claudeSkill = readFileSync(resolve(root, '.claude/skills/consulting-ops/SKILL.md'), 'utf8');
+  if (!claudeSkill.startsWith('---') || !claudeSkill.includes('run exactly `node consulting-ops.mjs`')) failures.push('Claude adapter is not self-contained');
   for (const mode of routedModeFiles) if (!existsSync(resolve(root, `modes/${mode}.md`))) failures.push(`missing routed mode instructions: modes/${mode}.md`);
   const cli = readFileSync(resolve(root, 'consulting-ops.mjs'), 'utf8');
   for (const command of commands) if (!cli.includes(`${command}:`) && !cli.includes(`'${command}':`) && !cli.includes(`'${command}'`)) failures.push(`missing CLI command: ${command}`);
