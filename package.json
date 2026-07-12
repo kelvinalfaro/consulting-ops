@@ -30,7 +30,7 @@
     "plugins": "node plugin-manager.mjs list",
     "plugin:audit": "node plugin-manager.mjs audit",
     "plugin:install": "node plugin-manager.mjs install",
-    "test": "node --test tests/consulting-ops/*.test.mjs",
+    "test": "node test-all.mjs",
     "build:dashboard": "node build-dashboard.mjs",
     "serve:dashboard": "node dashboard-server.mjs",
     "onboard": "node onboard.mjs",

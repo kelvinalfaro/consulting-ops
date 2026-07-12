@@ -15,6 +15,7 @@ const requiredFiles = [
   'dashboard-server.mjs', 'update-system.mjs', 'release-audit.mjs', 'ARCHITECTURE.md',
   'DATA_CONTRACT.md', 'PARITY.md', 'README.md', 'AGENTS.md', 'templates/states.yml', 'providers/_registry.mjs',
   'operational-tools.mjs', 'plugin-manager.mjs',
+  'test-all.mjs',
   'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'GOVERNANCE.md', 'MAINTAINERS.md', 'SUPPORT.md',
   'LEGAL_DISCLAIMER.md', 'CONTRIBUTORS.md', 'CITATION.cff', 'DOCKER.md', 'Dockerfile', 'docker-compose.yml',
 ];
