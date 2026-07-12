@@ -135,7 +135,7 @@ The report provides a 1-5 fit score, confidence level, evidence gaps, and one of
 - [x] Replace governing `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, and other adapters with consulting-ops instructions.
 - [x] Define schemas and examples for firm profile, capability statement, case studies, team bios, opportunity records, and tracker states.
 - [x] Rewrite `doctor.mjs` to check consulting prerequisites and create only safe files from templates.
-- [ ] Add a migration helper for an existing partial `career-ops` copy.
+- [x] Add a review-first migration helper for an existing partial `career-ops` copy.
 
 **Exit:** a new user can onboard without a CV, salary target, job portal, or interview file.
 
@@ -154,7 +154,7 @@ The report provides a 1-5 fit score, confidence level, evidence gaps, and one of
 - [x] Replace job-fit modes with RFP instructions and machine-readable report summaries.
 - [x] Implement hard-gate checks, weighted scoring, missing information, and clarification requirements.
 - [x] Replace the application tracker utilities with RFP lifecycle states and fields.
-- [ ] Add further tests for duplicate solicitations, amendments, and unknown budgets. Overdue and mandatory-requirement cases are covered.
+- [x] Add tests for duplicate solicitations, amendments, unknown budgets, overdue deadlines, and mandatory requirements.
 
 **Exit:** one command can evaluate a captured RFP and register an evidence-backed decision.
 

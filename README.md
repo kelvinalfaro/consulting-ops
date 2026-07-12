@@ -62,6 +62,17 @@ consulting-ops contact <record>                Prepare compliant procurement con
 consulting-ops email <record>                  Draft, but do not send, procurement email
 consulting-ops contract <record>               Create contract issue-spotting checklist
 consulting-ops finalist <record>               Create finalist/interview preparation pack
+consulting-ops finalist-plan <record>          Create a time-blocked finalist preparation plan
+consulting-ops finalist-practice <record>      Create an evidence-grounded rehearsal worksheet
+consulting-ops finalist-debrief <record>       Capture finalist questions, commitments, and follow-up
+consulting-ops letter <record>                 Create a standalone cover letter / LOI workspace
+consulting-ops apply <proposal-workspace>      Map portal fields and attachments; stop before submit
+consulting-ops agent-inbox add|list|resolve     Manage durable cross-session requests
+consulting-ops training <credential>           Assess training or certification investment
+consulting-ops service <offering>              Assess a service or portfolio-offering idea
+consulting-ops adjacent <target>               Assess adjacent opportunity targets
+consulting-ops jurisdiction <market>           Calibrate eligibility for a procurement market
+consulting-ops evidence-add <source>            Stage new firm evidence for approval
 consulting-ops submission <workspace>          Prepare final human review checklist
 consulting-ops export <workspace>              Export review-marked PDF/DOCX
 consulting-ops tracker list                    Show tracker and metrics

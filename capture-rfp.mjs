@@ -2,7 +2,7 @@
 
 /** Capture a URL or local file while preserving an authoritative source copy. */
 
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { basename, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
@@ -16,9 +16,40 @@ function titleFromHtml(html) {
   return match?.[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() || null;
 }
 
+function canonicalUrl(value) {
+  try {
+    const url = new URL(value);
+    url.hash = '';
+    url.hostname = url.hostname.toLowerCase();
+    url.pathname = url.pathname.replace(/\/+$/, '') || '/';
+    return url.href;
+  } catch { return null; }
+}
+
+function findExistingUrl(outputRoot, source) {
+  const target = canonicalUrl(source);
+  if (!target || !existsSync(outputRoot)) return null;
+  for (const entry of readdirSync(outputRoot, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const record = join(outputRoot, entry.name, 'opportunity.yml');
+    if (!existsSync(record)) continue;
+    try {
+      const opportunity = yaml.load(readFileSync(record, 'utf8'));
+      if (canonicalUrl(opportunity?.source_url) === target) return { folder: join(outputRoot, entry.name), record };
+    } catch { /* malformed records are handled by verification, not duplicate lookup */ }
+  }
+  return null;
+}
+
 export async function captureSource(source, options = {}) {
   const id = options.id ?? `RFP-${new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14)}`;
-  const folder = resolve(options.outputRoot ?? 'data/opportunities', slug(id));
+  const outputRoot = resolve(options.outputRoot ?? 'data/opportunities');
+  const duplicate = /^https?:\/\//i.test(source) ? findExistingUrl(outputRoot, source) : null;
+  if (duplicate) {
+    if (options.reuse) return { ...duplicate, source: null, reused: true, duplicate_url: true };
+    throw new Error(`Solicitation URL is already captured: ${duplicate.record}`);
+  }
+  const folder = resolve(outputRoot, slug(id));
   if (existsSync(folder)) {
     if (options.reuse && existsSync(join(folder, 'opportunity.yml'))) {
       return { folder, record: join(folder, 'opportunity.yml'), source: null, reused: true };
@@ -102,7 +133,7 @@ async function main() {
   const titleIndex = args.indexOf('--title');
   const id = idIndex >= 0 && args[idIndex + 1] ? args[idIndex + 1] : undefined;
   const title = titleIndex >= 0 && args[titleIndex + 1] ? args[titleIndex + 1] : undefined;
-  console.log(JSON.stringify(await captureSource(source, { id, title }), null, 2));
+  console.log(JSON.stringify(await captureSource(source, { id, title, reuse: args.includes('--reuse') }), null, 2));
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

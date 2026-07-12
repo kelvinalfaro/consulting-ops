@@ -6,11 +6,20 @@ import { fileURLToPath } from 'node:url';
 import { runAutoPipeline } from './auto-pipeline.mjs';
 
 export function pendingItems(markdown) {
-  return markdown.split(/\r?\n/).map((line, index) => ({ line, index })).filter(({ line }) => /^\s*- \[ \]\s+/.test(line)).map((item) => {
+  let inPending = false;
+  return markdown.split(/\r?\n/).map((line, index) => {
+    if (/^##\s+Pending\s*$/i.test(line)) inPending = true;
+    else if (inPending && /^##\s+/.test(line)) inPending = false;
+    return { line, index, inPending };
+  }).filter(({ line, inPending }) => inPending && /^\s*- \[ \]\s+/.test(line)).map((item) => {
     const raw = item.line.replace(/^\s*- \[ \]\s+/, '').trim();
     const source = raw.split(/\s+\|\s+/)[0].trim();
     return { ...item, raw, source };
   }).filter((item) => item.source);
+}
+
+export function pendingUrls(markdown) {
+  return pendingItems(markdown).map((item) => item.source).filter((source) => /^https?:\/\//i.test(source));
 }
 
 export async function processPipeline(options = {}) {

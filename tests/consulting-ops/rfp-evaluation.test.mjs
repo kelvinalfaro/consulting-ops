@@ -61,3 +61,10 @@ test('weighted scoring reports missing dimensions and coverage', () => {
   assert.equal(result.coverage, 25);
   assert.ok(result.missing.includes('strategic_value'));
 });
+
+test('unknown budget remains an explicit information gap without fabricating an amount', () => {
+  const opportunity = completeOpportunity({ budget: { stated: false, amount: null, currency: 'USD' } });
+  const result = evaluateOpportunity(opportunity, {}, { now });
+  assert.ok(result.information_gaps.includes('budget'));
+  assert.equal(opportunity.budget.amount, null);
+});

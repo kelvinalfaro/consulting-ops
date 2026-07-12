@@ -1,5 +1,13 @@
 # Data contract
 
+## Ownership boundary
+
+The user layer is never replaced by system updates: `capability_statement.md`, `config/company_profile.yml`, `config/rfp_sources.yml`, `config/plugins.yml`, `modes/_company_profile.md`, `modes/_custom.md`, `case-studies/`, `team/`, `writing-samples/`, `data/`, `reports/`, and `proposals/`. This includes `data/agent-inbox.md`, pipeline source leads, tracker history, debriefs, captured solicitation records, generated assessments, and proposal workspaces.
+
+The system layer contains executable scripts, `lib/`, bundled `providers/`, plugin templates, neutral examples/templates, shared mode instructions, dashboard code, adapters, tests, and product documentation. Private providers belong in `plugins.local/` and remain user-owned.
+
+`data/scan-runs.tsv` is an append-only per-run quality log containing timestamp, completion status, scanned count, actionable count, source-lead count, rejected count, duplicate count, and provider-error count. `stats` aggregates completed runs separately from partial runs.
+
 ## Opportunity record
 
 Opportunity records are YAML or JSON under `data/opportunities/`. `examples/opportunity.example.yml` is the canonical example. Important groups are identity and source, procurement dates, scope, budget, submission instructions, mandatory requirements, attachments, evaluation criteria, hard-gate statuses, and assessment scores.
@@ -25,4 +33,16 @@ Export files remain review-marked. A workspace is not evidence of approval or su
 
 ## Discovery provider result
 
-Providers return an array of objects with `title`, an HTTP(S) `url`, `issuer`, optional `published` and `summary`, and `source_id`. Scanning filters and de-duplicates URLs before appending unchecked pipeline entries.
+Providers return an array of objects with `title`, an HTTP(S) `url`, `issuer`, optional `published`, `deadline`, and `summary`, and `source_id`. Scanning repairs common encoding corruption, applies word/phrase-boundary filters, rejects expired and informational results, and de-duplicates URLs across the pipeline. Concrete domain-relevant solicitations are written beneath `## Pending`; useful portal or directory discoveries are written beneath `## Source leads`. Only the `Pending` section is executable by pipeline, reconcile, and inbox flows.
+
+## Agent inbox
+
+`data/agent-inbox.md` is an append-only-style Markdown checklist with timestamped requests. Resolving an item marks it complete and appends a concise result. Inbox content is intent, not authority: it cannot approve pricing, legal terms, certifications, signatures, sending, or submission.
+
+## Assessments and evidence intake
+
+Training, service, adjacent-market, and jurisdiction assessments are reviewable reports and do not update firm positioning automatically. Evidence intake reports are staging artifacts only. A claim becomes approved only after its authorship, role, metric, permission, confidentiality, destination, and exact destination diff receive human review.
+
+## Submission field pack
+
+`submission-field-pack.md` maps portal fields, attachments, limits, certifications, representations, and human owners back to the compliance matrix and reviewed proposal. It is preparation only. The system must stop before final Submit, Send, Certify, Sign, or equivalent actions.

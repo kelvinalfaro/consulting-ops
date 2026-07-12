@@ -6,42 +6,63 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = dirname(fileURLToPath(import.meta.url));
-const commands = {
+export const commands = {
   doctor: 'doctor.mjs', onboard: 'onboard.mjs', auto: 'auto-pipeline.mjs', capture: 'capture-rfp.mjs',
   extract: 'extract-rfp.mjs', amend: 'add-amendment.mjs', evaluate: 'evaluate-rfp.mjs', proposal: 'generate-proposal-draft.mjs', export: 'export-proposal.mjs',
   tracker: 'rfp-tracker.mjs', compare: 'compare-rfps.mjs', 'search-terms': 'expand-search-terms.mjs', scan: 'scan-rfps.mjs', pipeline: 'process-pipeline.mjs', batch: 'batch-rfps.mjs',
   deadlines: 'deadline-watch.mjs', followup: 'followup.mjs', patterns: 'analyze-outcomes.mjs', research: 'client-research.mjs',
   debrief: 'debrief.mjs', submission: 'submission-prep.mjs', dashboard: 'build-dashboard.mjs', serve: 'dashboard-server.mjs', update: 'update-system.mjs', plugins: 'plugin-manager.mjs',
+  'agent-inbox': 'agent-inbox.mjs',
+  apply: 'submission-field-pack.mjs',
+  'evidence-add': 'evidence-intake.mjs',
+  migrate: 'migrate-career-ops.mjs',
 };
 
-const artifactModes = new Set(['contact', 'email', 'contract', 'finalist', 'evidence']);
-const operationalModes = new Set(['verify', 'normalize', 'dedup', 'stats', 'find', 'add', 'status', 'reconcile', 'liveness', 'inbox', 'quality']);
+export const artifactModes = new Set(['contact', 'email', 'contract', 'finalist', 'evidence', 'letter', 'finalist-plan', 'finalist-practice', 'finalist-debrief']);
+export const growthModes = new Set(['training', 'service', 'adjacent', 'jurisdiction']);
+export const operationalModes = new Set(['verify', 'normalize', 'dedup', 'stats', 'find', 'add', 'status', 'reconcile', 'liveness', 'inbox', 'quality']);
 
 function help() {
-  console.log(`consulting-ops -- RFP Pursuit Command Center
+  console.log(`consulting-ops -- Command Center
 
-Usage:
-  consulting-ops <URL-or-file>       Auto-pipeline: capture, extract, evaluate, track, and conditionally draft
-  consulting-ops auto <source>       Run the same auto-pipeline explicitly
-  consulting-ops onboard             Guided firm setup
-  consulting-ops scan                Discover opportunities from configured sources
-  consulting-ops pipeline            Process data/rfp_pipeline.md
-  consulting-ops capture <source>    Preserve an RFP URL or file
-  consulting-ops extract <record>    Extract dates, requirements, criteria, contacts, and budget
-  consulting-ops amend <record> <source> Preserve an amendment and flag changes
-  consulting-ops evaluate <record>   Bid/no-bid evaluation, report, and tracker update
-  consulting-ops proposal <record>   Compliance-first proposal workspace
-  consulting-ops tracker [command]   Pipeline status and metrics
-  consulting-ops dashboard           Build the HTML dashboard
-  consulting-ops serve [port]        Serve the dashboard locally
-  consulting-ops doctor              Validate setup
-  consulting-ops verify              Verify tracker integrity and canonical states
-  consulting-ops dedup [--dry-run]   Detect and merge duplicate tracker rows
-  consulting-ops reconcile           Compare pipeline sources with captured records
-  consulting-ops liveness            Check captured source URLs
-  consulting-ops inbox               Summarize pending, urgent, and unowned work
+Available commands:
+  consulting-ops <URL-or-file>  -> AUTO-PIPELINE: capture + extract + evaluate + tracker + conditional proposal
+  consulting-ops scan           -> Discover current consulting opportunities from configured sources
+  consulting-ops pipeline       -> Process pending sources in data/rfp_pipeline.md
+  consulting-ops evaluate       -> Bid/no-bid evaluation with hard gates and weighted fit
+  consulting-ops proposal       -> Compliance matrix, response outline, and source-grounded draft workspace
+  consulting-ops compare        -> Compare and rank multiple pursuits
+  consulting-ops research       -> Issuer and opportunity research brief
+  consulting-ops contact        -> Procurement contact brief and outreach preparation
+  consulting-ops email          -> Draft-only procurement or follow-up email
+  consulting-ops evidence       -> Claim evidence register and gap review
+  consulting-ops evidence-add   -> Stage a new case study, credential, or writing sample for approval
+  consulting-ops letter         -> Standalone cover letter or letter of interest workspace
+  consulting-ops amend          -> Preserve an amendment and flag material changes
+  consulting-ops submission     -> Final human-review submission checklist; never submits
+  consulting-ops apply          -> Prepare portal fields and attachments; always stops before submission
+  consulting-ops export         -> Export review-marked PDF and DOCX
+  consulting-ops finalist       -> Finalist presentation and interview preparation pack
+  consulting-ops finalist-plan  -> Time-blocked finalist preparation plan
+  consulting-ops finalist-practice -> One-question-at-a-time rehearsal worksheet
+  consulting-ops finalist-debrief -> Post-finalist evidence and action debrief
+  consulting-ops contract       -> Contract issue checklist for professional/legal review
+  consulting-ops tracker        -> Pursuit status, lifecycle, and metrics
+  consulting-ops inbox          -> Pending, urgent, and unowned pursuit work
+  consulting-ops agent-inbox    -> Queue, inspect, and resolve cross-session requests
+  consulting-ops deadlines      -> Deadline and compliance watch
+  consulting-ops followup       -> Follow-up cadence and draft preparation
+  consulting-ops debrief        -> Capture pursuit outcome and lessons
+  consulting-ops patterns       -> Analyze win/loss/no-bid patterns
+  consulting-ops dashboard      -> Build the local pursuit dashboard
+  consulting-ops doctor         -> Validate setup and prerequisites
+  consulting-ops update         -> Preview/apply system updates safely
+  consulting-ops training       -> Assess a course or credential against firm strategy
+  consulting-ops service        -> Assess a new consulting service or portfolio offering
+  consulting-ops adjacent       -> Assess adjacent opportunity and market targets
+  consulting-ops jurisdiction   -> Calibrate eligibility and pursuit readiness for a procurement market
 
-Additional modes: normalize, stats, find, add, status, quality, batch, deadlines, followup, research, debrief, patterns, contact, email, contract, finalist, evidence, and update.
+Utilities: onboard, migrate, auto, capture, extract, batch, verify, normalize, dedup, reconcile, liveness, quality, stats, find, add, status, plugins, search-terms, and serve.
 The system never submits a proposal.`);
 }
 
@@ -68,15 +89,24 @@ function init(args) {
   console.log(`\nInstalled consulting-ops in ${target}\n\nNext:\n  cd ${target}\n  npx consulting-ops onboard`);
 }
 
-try {
+export function resolveRoute(mode, args = []) {
+  if (artifactModes.has(mode)) return { script: 'pursuit-artifact.mjs', args: [mode, ...args] };
+  if (growthModes.has(mode)) return { script: 'growth-assessment.mjs', args: [mode, ...args] };
+  if (operationalModes.has(mode)) return { script: 'operational-tools.mjs', args: [mode, ...args] };
+  if (commands[mode]) return { script: commands[mode], args };
+  return { script: 'auto-pipeline.mjs', args: [mode, ...args] };
+}
+
+function main() {
   const [mode, ...args] = process.argv.slice(2);
   if (!mode || ['help', '-h', '--help'].includes(mode)) help();
   else if (mode === 'init') init(args);
-  else if (artifactModes.has(mode)) run('pursuit-artifact.mjs', [mode, ...args]);
-  else if (operationalModes.has(mode)) run('operational-tools.mjs', [mode, ...args]);
-  else if (commands[mode]) run(commands[mode], args);
-  else run('auto-pipeline.mjs', [mode, ...args]);
-} catch (error) {
-  console.error(error.message);
-  process.exit(1);
+  else {
+    const route = resolveRoute(mode, args);
+    run(route.script, route.args);
+  }
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try { main(); } catch (error) { console.error(error.message); process.exit(1); }
 }
