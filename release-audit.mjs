@@ -21,7 +21,7 @@ const secretPatterns = [
 
 function trackedFiles() {
   try {
-    return execFileSync('git', ['ls-files'], { encoding: 'utf8' }).split(/\r?\n/).filter(Boolean);
+    return execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], { encoding: 'utf8' }).split(/\r?\n/).filter(Boolean);
   } catch {
     throw new Error('Git repository not initialized; release audit requires a staging inventory');
   }
@@ -42,6 +42,6 @@ export function audit(files) {
 if (process.argv[1]?.endsWith('release-audit.mjs')) {
   const files = trackedFiles();
   const failures = audit(files);
-  console.log(JSON.stringify({ tracked_files: files.length, failures }, null, 2));
+  console.log(JSON.stringify({ release_candidate_files: files.length, failures }, null, 2));
   if (failures.length) process.exitCode = 1;
 }

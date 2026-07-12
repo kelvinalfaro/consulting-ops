@@ -9,9 +9,10 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         node: [18, 22]
     steps:
       - uses: actions/checkout@v4
@@ -21,8 +22,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: |
-          cp capability_statement.example.md capability_statement.md
-          cp config/company_profile.example.yml config/company_profile.yml
-          cp modes/_company_profile.template.md modes/_company_profile.md
-          node doctor.mjs --json
+      - run: npm run audit:parity
+      - run: npm run audit:release
+      - run: npm pack --dry-run
+      - run: node onboard.mjs --answers examples/onboarding-answers.example.json --target .ci-workspace
+      - run: node doctor.mjs --target .ci-workspace
+      - if: matrix.os == 'ubuntu-latest' && matrix.node == 22
+        run: docker build -t consulting-ops-ci .

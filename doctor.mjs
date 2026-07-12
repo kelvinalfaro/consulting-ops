@@ -11,13 +11,17 @@ import {
 } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 
+const systemRoot = dirname(fileURLToPath(import.meta.url));
+const systemRequire = createRequire(import.meta.url);
+const dependenciesInstalled = (() => { try { systemRequire.resolve('js-yaml'); return true; } catch { return false; } })();
 const root = (() => {
   const args = process.argv.slice(2);
   const index = args.indexOf('--target');
   return index >= 0 && args[index + 1]
     ? args[index + 1]
-    : dirname(fileURLToPath(import.meta.url));
+    : process.cwd();
 })();
 
 const jsonOutput = process.argv.includes('--json');
@@ -143,7 +147,7 @@ function printHuman(result) {
   console.log('=====================\n');
   const nodeMajor = Number(process.versions.node.split('.')[0]);
   console.log(`${nodeMajor >= 18 ? 'OK' : 'FAIL'} Node.js >= 18 (v${process.versions.node})`);
-  console.log(`${existsSync(join(root, 'node_modules')) ? 'OK' : 'FAIL'} Dependencies installed`);
+  console.log(`${dependenciesInstalled ? 'OK' : 'FAIL'} Dependencies installed`);
   for (const prerequisite of USER_LAYER_PREREQS) {
     console.log(`${fileExists(prerequisite.path) ? 'OK' : 'MISSING'} ${prerequisite.path}`);
   }
@@ -152,7 +156,7 @@ function printHuman(result) {
   }
   for (const warning of result.warnings) console.log(`WARNING ${warning}`);
   for (const item of result.created) console.log(`CREATED ${item}`);
-  if (nodeMajor < 18 || !existsSync(join(root, 'node_modules')) || result.onboardingNeeded) {
+  if (nodeMajor < 18 || !dependenciesInstalled || result.onboardingNeeded) {
     console.log('\nSetup is incomplete. Copy the listed example/template files and replace placeholders with approved firm information.');
     process.exitCode = 1;
   } else {

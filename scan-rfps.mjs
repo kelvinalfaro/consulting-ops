@@ -6,6 +6,7 @@ import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import yaml from 'js-yaml';
+import { loadProviderPlugins, resolveProvider } from './providers/_registry.mjs';
 
 const DEFAULT_CONFIG = 'config/rfp_sources.yml';
 const DEFAULT_PIPELINE = 'data/rfp_pipeline.md';
@@ -73,11 +74,25 @@ function pipelineLines(items) {
   return items.map((item) => `- [ ] ${item.url} | ${item.issuer || 'Unknown issuer'} | ${item.title}${item.published ? ` | published ${item.published}` : ''}`).join('\n');
 }
 
-async function fetchSource(source) {
+async function fetchSource(source, config = {}, providers = new Map()) {
   if (source.type === 'manual') return [];
+  if (source.type === 'web_search') {
+    const queries = (config.search_terms ?? []).slice(0, source.max_queries ?? 10);
+    const results = [];
+    for (const query of queries) {
+      const url = `${source.endpoint ?? 'https://www.bing.com/search?format=rss&q='}${encodeURIComponent(query)}`;
+      const response = await fetch(url, { headers: { 'user-agent': 'consulting-ops/0.2 (+local RFP discovery)' },
+        redirect: 'follow', signal: AbortSignal.timeout(source.timeout_ms ?? 20000) });
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      results.push(...parseFeed(await response.text(), { ...source, label: source.label ?? 'Web search' }));
+    }
+    return results;
+  }
+  const plugin = resolveProvider(providers, source.type);
+  if (plugin) return plugin.fetch(source, { config, fetch, parseFeed, parseJsonFeed });
   if (!source.url) throw new Error(`Source ${source.id} requires url`);
   const response = await fetch(source.url, {
-    headers: { 'user-agent': 'consulting-ops/0.1 (+local RFP discovery)' },
+    headers: { 'user-agent': 'consulting-ops/0.2 (+local RFP discovery)' },
     redirect: 'follow',
     signal: AbortSignal.timeout(source.timeout_ms ?? 20000),
   });
@@ -91,12 +106,13 @@ export async function scan(config, options = {}) {
   const pipelinePath = resolve(options.pipelinePath ?? DEFAULT_PIPELINE);
   const current = existsSync(pipelinePath) ? readFileSync(pipelinePath, 'utf8') : '# RFP pipeline\n\n## Pending\n\n## Processed\n';
   const seen = existingUrls(current);
+  const providers = options.providers ?? await loadProviderPlugins(options.providerRoots ?? ['providers', 'plugins.local']);
   const found = [];
   const errors = [];
   for (const source of config.sources ?? []) {
     if (source.enabled === false) continue;
     try {
-      const items = await fetchSource(source);
+      const items = await fetchSource(source, config, providers);
       for (const item of items) {
         if (!seen.has(item.url) && keywordMatch(item, config.filters)) {
           seen.add(item.url);

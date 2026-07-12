@@ -1,0 +1,6 @@
+#!/usr/bin/env node
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+export function submissionReadiness(workspace){const folder=resolve(workspace);const matrix=resolve(folder,'compliance-matrix.md');const review=resolve(folder,'review-checklist.md');const files=[matrix,review].filter(existsSync);const text=files.map((f)=>readFileSync(f,'utf8')).join('\n');const unchecked=(text.match(/- \[ \]/g)||[]).length;const unknown=(text.match(/\b(?:Unknown|Open|Unassigned|To confirm)\b/gi)||[]).length;return{workspace:folder,files_checked:files.length,unchecked_items:unchecked,unresolved_signals:unknown,ready_for_human_submission_review:files.length===2&&unchecked===0&&unknown===0,submission_performed:false}}
+function main(){const workspace=process.argv[2];if(!workspace){console.log('Usage: node submission-prep.mjs <proposal-workspace>');process.exit(1)}const result=submissionReadiness(workspace);writeFileSync(resolve(workspace,'submission-readiness.json'),JSON.stringify(result,null,2)+'\n','utf8');console.log(JSON.stringify(result,null,2));if(!result.ready_for_human_submission_review)process.exitCode=2}if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url))main();

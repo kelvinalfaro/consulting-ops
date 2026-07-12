@@ -8,6 +8,11 @@ search_terms:
 sources:
   # Add public RSS feeds, APIs, search result pages, or procurement portals.
   # Provider implementations must respect site terms and robots guidance.
+  - id: public-web-search
+    type: web_search
+    enabled: true
+    label: "Public web search"
+    max_queries: 10
   - id: example-manual
     type: manual
     enabled: true

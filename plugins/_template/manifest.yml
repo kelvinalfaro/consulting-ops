@@ -1,0 +1,4 @@
+id: example-provider
+name: Example RFP provider
+version: 0.1.0
+description: Copy this folder to plugins.local and implement provider.mjs.

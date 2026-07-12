@@ -1,0 +1,17 @@
+{
+  "firm_name": "Example Consulting LLC",
+  "contact_name": "Primary contact",
+  "contact_email": "contact@example.com",
+  "website": "https://example.com",
+  "location": "City, State or Region",
+  "summary": "Example Consulting helps mission-driven organizations plan and implement change.",
+  "services": "Strategic planning, Facilitation, Organizational development",
+  "client_types": "Nonprofit, Public sector, Higher education",
+  "geographies": "Remote",
+  "minimum_budget": "",
+  "pricing_models": "Fixed fee, Phased",
+  "currency": "USD",
+  "teaming_allowed": "yes",
+  "certifications": "",
+  "classification_codes": ""
+}

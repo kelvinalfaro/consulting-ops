@@ -16,6 +16,45 @@ function titleFromHtml(html) {
   return match?.[1].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() || null;
 }
 
+export async function captureSource(source, options = {}) {
+  const id = options.id ?? `RFP-${new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14)}`;
+  const folder = resolve(options.outputRoot ?? 'data/opportunities', slug(id));
+  if (existsSync(folder)) {
+    if (options.reuse && existsSync(join(folder, 'opportunity.yml'))) {
+      return { folder, record: join(folder, 'opportunity.yml'), source: null, reused: true };
+    }
+    throw new Error(`Opportunity folder already exists: ${folder}`);
+  }
+  mkdirSync(folder, { recursive: true });
+
+  let sourceUrl = null;
+  let sourceFile = null;
+  let inferredTitle = null;
+  if (/^https?:\/\//i.test(source)) {
+    sourceUrl = source;
+    const response = await fetch(source, { redirect: 'follow', signal: AbortSignal.timeout(30000) });
+    if (!response.ok) throw new Error(`Source fetch failed: ${response.status} ${response.statusText}`);
+    const contentType = response.headers.get('content-type') ?? '';
+    const extension = contentType.includes('pdf') ? '.pdf' : contentType.includes('html') ? '.html'
+      : contentType.includes('wordprocessingml') ? '.docx' : '.bin';
+    const bytes = Buffer.from(await response.arrayBuffer());
+    sourceFile = `source${extension}`;
+    writeFileSync(join(folder, sourceFile), bytes);
+    if (extension === '.html') inferredTitle = titleFromHtml(bytes.toString('utf8'));
+  } else {
+    const local = resolve(source);
+    if (!existsSync(local)) throw new Error(`Source file not found: ${local}`);
+    sourceFile = `source${extname(local) || '.bin'}`;
+    copyFileSync(local, join(folder, sourceFile));
+    inferredTitle = basename(local, extname(local));
+  }
+
+  const opportunity = buildOpportunity({ id, sourceUrl, sourceFile, title: options.title ?? inferredTitle });
+  const record = join(folder, 'opportunity.yml');
+  writeFileSync(record, yaml.dump(opportunity, { noRefs: true, lineWidth: 100 }), 'utf8');
+  return { folder, record, source: join(folder, sourceFile), opportunity, reused: false };
+}
+
 export function buildOpportunity({ id, sourceUrl = null, sourceFile = null, title = null }) {
   return {
     id,
@@ -61,37 +100,9 @@ async function main() {
   }
   const idIndex = args.indexOf('--id');
   const titleIndex = args.indexOf('--title');
-  const id = idIndex >= 0 && args[idIndex + 1] ? args[idIndex + 1] : `RFP-${new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14)}`;
-  const folder = resolve('data/opportunities', slug(id));
-  if (existsSync(folder)) throw new Error(`Opportunity folder already exists: ${folder}`);
-  mkdirSync(folder, { recursive: true });
-
-  let sourceUrl = null;
-  let sourceFile = null;
-  let inferredTitle = null;
-  if (/^https?:\/\//i.test(source)) {
-    sourceUrl = source;
-    const response = await fetch(source, { redirect: 'follow', signal: AbortSignal.timeout(30000) });
-    if (!response.ok) throw new Error(`Source fetch failed: ${response.status} ${response.statusText}`);
-    const contentType = response.headers.get('content-type') ?? '';
-    const extension = contentType.includes('pdf') ? '.pdf' : contentType.includes('html') ? '.html' : '.bin';
-    const bytes = Buffer.from(await response.arrayBuffer());
-    sourceFile = `source${extension}`;
-    writeFileSync(join(folder, sourceFile), bytes);
-    if (extension === '.html') inferredTitle = titleFromHtml(bytes.toString('utf8'));
-  } else {
-    const local = resolve(source);
-    if (!existsSync(local)) throw new Error(`Source file not found: ${local}`);
-    sourceFile = `source${extname(local) || '.bin'}`;
-    copyFileSync(local, join(folder, sourceFile));
-    inferredTitle = basename(local, extname(local));
-  }
-
-  const title = titleIndex >= 0 && args[titleIndex + 1] ? args[titleIndex + 1] : inferredTitle;
-  const opportunity = buildOpportunity({ id, sourceUrl, sourceFile, title });
-  const record = join(folder, 'opportunity.yml');
-  writeFileSync(record, yaml.dump(opportunity, { noRefs: true, lineWidth: 100 }), 'utf8');
-  console.log(JSON.stringify({ folder, record, source: join(folder, sourceFile) }, null, 2));
+  const id = idIndex >= 0 && args[idIndex + 1] ? args[idIndex + 1] : undefined;
+  const title = titleIndex >= 0 && args[titleIndex + 1] ? args[titleIndex + 1] : undefined;
+  console.log(JSON.stringify(await captureSource(source, { id, title }), null, 2));
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

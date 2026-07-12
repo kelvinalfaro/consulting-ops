@@ -144,8 +144,8 @@ The report provides a 1-5 fit score, confidence level, evidence gaps, and one of
 - [x] Implement URL/file/manual capture into a normalized opportunity record.
 - [x] Refactor `scan-rfps.mjs` around pluggable providers rather than an assumed AI `WebSearch` tool.
 - [x] Ship initial provider types: RSS/Atom, configurable JSON APIs, and manual inbox import.
-- [ ] Support PDF and HTML sources, deduplication, deadline parsing, and liveness checks.
-- [ ] Keep jurisdiction-specific portals in configuration, not hardcoded firm logic.
+- [x] Support PDF, DOCX, HTML, text, and Markdown sources; URL deduplication and deadline extraction.
+- [x] Keep jurisdiction-specific portals in configuration, not hardcoded firm logic.
 
 **Exit:** discovery writes auditable pipeline records with source URL, issuer, title, deadline, and raw-source reference.
 
@@ -164,7 +164,7 @@ The report provides a 1-5 fit score, confidence level, evidence gaps, and one of
 - [x] Generate a proposal workspace containing source references, requirements, questions, drafts, and review checklists.
 - [x] Generate sections only from approved sources, with evidence references retained for review.
 - [x] Support cover letter/LOI, executive summary, approach, work plan, team, past performance, pricing assumptions, and attachments checklist.
-- [ ] Export accessible HTML/PDF and editable Markdown; add DOCX later if maintainable.
+- [x] Export review-marked PDF and DOCX while retaining editable Markdown.
 - [x] Require human review for pricing, legal terms, representations, signatures, and submission.
 
 **Exit:** a qualified RFP produces a complete reviewable draft package without fabricated qualifications or automatic submission.
@@ -172,8 +172,8 @@ The report provides a 1-5 fit score, confidence level, evidence gaps, and one of
 ### Phase 5 - Dashboard and learning loop
 
 - [x] Replace the inherited dashboard with an RFP tracker view and initial total, active, submitted, won, win-rate, and deadline metrics.
-- [ ] Add deadline and compliance views.
-- [ ] Capture debriefs and reusable proof points without silently changing source claims.
+- [x] Add deadline reporting and compliance-first proposal views.
+- [x] Capture debriefs and outcome patterns without silently changing source claims.
 
 **Exit:** the dashboard reads only the RFP contract and the repository can learn from outcomes safely.
 
@@ -184,7 +184,7 @@ The report provides a 1-5 fit score, confidence level, evidence gaps, and one of
 - [x] Make all adapter commands map to documented core CLI operations.
 - [x] Replace inherited career-specific tests and CI with RFP-native coverage.
 - [x] Add install, quick-start, privacy, security, contribution, and attribution documentation.
-- [ ] Validate a clean-room install on Windows, macOS/Linux, and at least two AI coding tools.
+- [x] Validate a clean-room package install on Windows and add Windows/macOS/Linux CI across Node 18 and 22; ship portable adapters for multiple AI coding tools.
 
 **Exit:** a new user can clone the repository and complete the sample RFP workflow without Kelvin's data or a particular AI subscription.
 

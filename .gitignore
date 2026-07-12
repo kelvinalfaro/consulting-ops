@@ -35,3 +35,8 @@ reports/*
 # Local agent state
 .update-dismissed
 .update-lock
+
+.updates/
+
+plugins.local/
+config/plugins.yml

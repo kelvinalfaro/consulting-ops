@@ -1,6 +1,7 @@
 node_modules/
 dashboard/index.html
 .env*
+!.env.example
 capability_statement.md
 config/company_profile.yml
 config/rfp_sources.yml

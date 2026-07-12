@@ -86,6 +86,20 @@ ${criteria.length ? criteria.map((item) => `- ${typeof item === 'string' ? item 
 - [ ] Confirm whether amendments or bidder conferences exist.
 - [ ] Add opportunity-specific questions here before the question deadline.
 `,
+    'evidence-map.md': `# Evidence map
+
+Every material claim in the proposal must point to an approved source. Add only evidence you can verify.
+
+| Claim ID | Proposed claim | Approved source | Source location | Owner | Verification status |
+|---|---|---|---|---|---|
+| CLM-001 | [Claim to verify] | [Capability statement, case study, bio, or client-approved source] | [File and section] | Unassigned | Open |
+
+## Evidence rules
+
+- Do not infer results, credentials, certifications, availability, or client permission.
+- Use exact, supportable language; record the source before placing a claim in the draft.
+- Remove or qualify any claim that cannot be verified before final review.
+`,
     'proposal-draft.md': `# Proposal draft: ${clean(opportunity.title, 'Untitled opportunity')}
 
 > Working draft for human review. Do not submit from consulting-ops.
