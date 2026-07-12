@@ -1,0 +1,19 @@
+version: 1
+
+search_terms:
+  - '"request for proposals" "strategic planning"'
+  - '"request for qualifications" "executive coaching"'
+  - '"call for consultants" facilitation'
+
+sources:
+  # Add public RSS feeds, APIs, search result pages, or procurement portals.
+  # Provider implementations must respect site terms and robots guidance.
+  - id: example-manual
+    type: manual
+    enabled: true
+    label: "Manual opportunity inbox"
+
+filters:
+  include_terms: ["consulting", "coaching", "facilitation"]
+  exclude_terms: []
+  countries: ["United States"]

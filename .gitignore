@@ -1,0 +1,37 @@
+# Dependencies and generated artifacts
+node_modules/
+dashboard/index.html
+*.log
+*.bak
+.DS_Store
+Thumbs.db
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+
+# Private consulting-ops user layer
+capability_statement.md
+config/company_profile.yml
+config/rfp_sources.yml
+modes/_company_profile.md
+modes/_custom.md
+case-studies/*
+!case-studies/.gitkeep
+team/*
+!team/.gitkeep
+writing-samples/*
+!writing-samples/README.md
+data/*
+!data/opportunities/
+data/opportunities/*
+!data/opportunities/.gitkeep
+proposals/*
+!proposals/.gitkeep
+reports/*
+!reports/.gitkeep
+
+# Local agent state
+.update-dismissed
+.update-lock

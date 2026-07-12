@@ -1,0 +1,62 @@
+# consulting-ops canonical opportunity states
+states:
+  - id: discovered
+    label: Discovered
+    aliases: [new]
+    dashboard_group: pipeline
+  - id: qualified
+    label: Qualified
+    aliases: [screened]
+    dashboard_group: pipeline
+  - id: evaluated
+    label: Evaluated
+    aliases: [assessed]
+    dashboard_group: pipeline
+  - id: bid
+    label: Bid
+    aliases: [pursue]
+    dashboard_group: active
+  - id: drafting
+    label: Drafting
+    aliases: [proposal drafted]
+    dashboard_group: active
+  - id: review
+    label: Review
+    aliases: [proposal review]
+    dashboard_group: active
+  - id: submitted
+    label: Submitted
+    aliases: [sent]
+    dashboard_group: submitted
+  - id: shortlisted
+    label: Shortlisted
+    aliases: [finalist, interview]
+    dashboard_group: submitted
+  - id: won
+    label: Won
+    aliases: [awarded, selected]
+    dashboard_group: outcome
+  - id: lost
+    label: Lost
+    aliases: [not selected]
+    dashboard_group: outcome
+  - id: no-bid
+    label: No Bid
+    aliases: [declined, skip]
+    dashboard_group: closed
+  - id: withdrawn
+    label: Withdrawn
+    aliases: []
+    dashboard_group: closed
+  - id: cancelled
+    label: Cancelled
+    aliases: [canceled]
+    dashboard_group: closed
+  - id: expired
+    label: Expired
+    aliases: [closed]
+    dashboard_group: closed
+  - id: duplicate
+    label: Duplicate
+    aliases: [dupe]
+    dashboard_group: closed

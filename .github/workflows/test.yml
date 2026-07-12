@@ -1,0 +1,28 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: |
+          cp capability_statement.example.md capability_statement.md
+          cp config/company_profile.example.yml config/company_profile.yml
+          cp modes/_company_profile.template.md modes/_company_profile.md
+          node doctor.mjs --json

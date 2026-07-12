@@ -1,0 +1,37 @@
+{
+  "name": "consulting-ops",
+  "version": "0.1.0",
+  "description": "AI-agnostic RFP discovery, bid/no-bid, proposal, and consulting opportunity pipeline",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "doctor": "node doctor.mjs",
+    "scan": "node scan-rfps.mjs",
+    "capture": "node capture-rfp.mjs",
+    "evaluate": "node evaluate-rfp.mjs",
+    "proposal": "node generate-proposal-draft.mjs",
+    "tracker": "node rfp-tracker.mjs",
+    "audit:release": "node release-audit.mjs",
+    "test": "node --test tests/consulting-ops/*.test.mjs",
+    "test:legacy": "node test-all.mjs",
+    "build:dashboard": "node build-dashboard.mjs",
+    "serve:dashboard": "node dashboard-server.mjs"
+  },
+  "keywords": [
+    "rfp",
+    "consulting",
+    "proposal",
+    "procurement",
+    "bid-no-bid",
+    "ai-agnostic",
+    "automation"
+  ],
+  "author": "Kelvin Alfaro",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "js-yaml": "^4.1.1"
+  }
+}

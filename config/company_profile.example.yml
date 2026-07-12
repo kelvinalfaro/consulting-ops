@@ -1,0 +1,32 @@
+firm:
+  name: "Example Consulting LLC"
+  website: "https://example.com"
+  location: "City, State/Region"
+  contact_name: "Primary contact"
+  contact_email: "contact@example.com"
+  certifications: []
+  classification_codes: []
+
+services:
+  - name: "Strategic planning"
+    description: "Facilitation and planning support for mission-driven organizations"
+
+target_engagements:
+  client_types: ["nonprofit", "public sector", "higher education"]
+  geographies: ["remote"]
+  minimum_budget: null
+  preferred_duration: null
+
+capacity:
+  available_from: null
+  concurrent_engagements: null
+  teaming_allowed: true
+
+commercial:
+  currency: "USD"
+  preferred_models: ["fixed fee", "phased"]
+  pricing_requires_human_review: true
+
+proposal:
+  default_validity_days: 30
+  submission_requires_human_review: true

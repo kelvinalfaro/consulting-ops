@@ -1,0 +1,14 @@
+node_modules/
+dashboard/index.html
+.env*
+capability_statement.md
+config/company_profile.yml
+config/rfp_sources.yml
+modes/_company_profile.md
+modes/_custom.md
+case-studies/
+team/
+writing-samples/
+data/
+proposals/
+reports/
