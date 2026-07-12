@@ -123,27 +123,27 @@ The report provides a 1-5 fit score, confidence level, evidence gaps, and one of
 
 ### Phase 0 - Repository and licensing baseline
 
-- [ ] Preserve the original MIT license and add an upstream attribution notice.
-- [ ] Initialize a clean Git repository only after generated/private files are excluded.
-- [ ] Replace package metadata, URLs, keywords, maintainer information, and release configuration.
-- [ ] Document the fork/rewrite boundary and public/private data boundary.
+- [x] Preserve the original MIT license and add an upstream attribution notice.
+- [x] Initialize a clean Git repository only after generated/private files are excluded.
+- [x] Replace package metadata, URLs, keywords, maintainer information, and release configuration.
+- [x] Document the fork/rewrite boundary and public/private data boundary.
 
 **Exit:** no public metadata claims this is `career-ops`, and a dry-run file inventory contains no Alfaro-private content.
 
 ### Phase 1 - RFP-native contract and onboarding
 
-- [ ] Replace governing `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, and other adapters with consulting-ops instructions.
-- [ ] Define schemas and examples for firm profile, capability statement, case studies, team bios, opportunity records, and tracker states.
-- [ ] Rewrite `doctor.mjs` to check consulting prerequisites and create only safe files from templates.
+- [x] Replace governing `AGENTS.md`, `CLAUDE.md`, `CODEX.md`, and other adapters with consulting-ops instructions.
+- [x] Define schemas and examples for firm profile, capability statement, case studies, team bios, opportunity records, and tracker states.
+- [x] Rewrite `doctor.mjs` to check consulting prerequisites and create only safe files from templates.
 - [ ] Add a migration helper for an existing partial `career-ops` copy.
 
 **Exit:** a new user can onboard without a CV, salary target, job portal, or interview file.
 
 ### Phase 2 - Opportunity capture and discovery
 
-- [ ] Implement URL/file/manual capture into a normalized opportunity record.
-- [ ] Refactor `scan-rfps.mjs` around pluggable providers rather than an assumed AI `WebSearch` tool.
-- [ ] Ship initial provider types: configurable search URLs/RSS, public procurement feeds/APIs where available, and manual inbox import.
+- [x] Implement URL/file/manual capture into a normalized opportunity record.
+- [x] Refactor `scan-rfps.mjs` around pluggable providers rather than an assumed AI `WebSearch` tool.
+- [x] Ship initial provider types: RSS/Atom, configurable JSON APIs, and manual inbox import.
 - [ ] Support PDF and HTML sources, deduplication, deadline parsing, and liveness checks.
 - [ ] Keep jurisdiction-specific portals in configuration, not hardcoded firm logic.
 
@@ -151,27 +151,27 @@ The report provides a 1-5 fit score, confidence level, evidence gaps, and one of
 
 ### Phase 3 - Evaluation and bid/no-bid
 
-- [ ] Replace job-fit modes with RFP instructions and machine-readable report summaries.
-- [ ] Implement hard-gate checks, weighted scoring, confidence, missing information, and clarification questions.
-- [ ] Replace the application tracker utilities with RFP lifecycle states and fields.
-- [ ] Add tests for overdue opportunities, mandatory-requirement failures, duplicate solicitations, amendments, and unknown budgets.
+- [x] Replace job-fit modes with RFP instructions and machine-readable report summaries.
+- [x] Implement hard-gate checks, weighted scoring, missing information, and clarification requirements.
+- [x] Replace the application tracker utilities with RFP lifecycle states and fields.
+- [ ] Add further tests for duplicate solicitations, amendments, and unknown budgets. Overdue and mandatory-requirement cases are covered.
 
 **Exit:** one command can evaluate a captured RFP and register an evidence-backed decision.
 
 ### Phase 4 - Proposal workspace and documents
 
-- [ ] Build a compliance matrix before drafting narrative.
-- [ ] Generate a proposal workspace containing source documents, requirements, outline, task list, questions, drafts, and final exports.
-- [ ] Generate sections only from approved sources, with evidence references retained for review.
-- [ ] Support cover letter/LOI, executive summary, approach, work plan, team, past performance, pricing assumptions, and attachments checklist.
+- [x] Build a compliance matrix before drafting narrative.
+- [x] Generate a proposal workspace containing source references, requirements, questions, drafts, and review checklists.
+- [x] Generate sections only from approved sources, with evidence references retained for review.
+- [x] Support cover letter/LOI, executive summary, approach, work plan, team, past performance, pricing assumptions, and attachments checklist.
 - [ ] Export accessible HTML/PDF and editable Markdown; add DOCX later if maintainable.
-- [ ] Require human review for pricing, legal terms, representations, signatures, and submission.
+- [x] Require human review for pricing, legal terms, representations, signatures, and submission.
 
 **Exit:** a qualified RFP produces a complete reviewable draft package without fabricated qualifications or automatic submission.
 
 ### Phase 5 - Dashboard and learning loop
 
-- [ ] Replace career funnel metrics with pipeline value, deadlines, bid rate, shortlist rate, win rate, cycle time, source effectiveness, and loss reasons.
+- [x] Replace the inherited dashboard with an RFP tracker view and initial total, active, submitted, won, win-rate, and deadline metrics.
 - [ ] Add deadline and compliance views.
 - [ ] Capture debriefs and reusable proof points without silently changing source claims.
 
@@ -179,11 +179,11 @@ The report provides a 1-5 fit score, confidence level, evidence gaps, and one of
 
 ### Phase 6 - Cross-AI adapters and public release
 
-- [ ] Keep `AGENTS.md` as the portable baseline.
-- [ ] Provide thin Claude, Codex, OpenCode, Gemini, Qwen, Kimi, and other adapters only where useful.
-- [ ] Make all adapter commands map to documented core CLI operations.
-- [ ] Replace inherited career-specific tests and CI with RFP-native coverage.
-- [ ] Add install, quick-start, privacy, security, contribution, and migration documentation.
+- [x] Keep `AGENTS.md` as the portable baseline.
+- [x] Provide thin Claude, Codex, OpenCode, and Kimi adapters plus a standard shared skill; add others only where useful.
+- [x] Make all adapter commands map to documented core CLI operations.
+- [x] Replace inherited career-specific tests and CI with RFP-native coverage.
+- [x] Add install, quick-start, privacy, security, contribution, and attribution documentation.
 - [ ] Validate a clean-room install on Windows, macOS/Linux, and at least two AI coding tools.
 
 **Exit:** a new user can clone the repository and complete the sample RFP workflow without Kelvin's data or a particular AI subscription.

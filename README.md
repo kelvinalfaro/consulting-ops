@@ -12,7 +12,7 @@ No command submits a proposal. Pricing, legal terms, representations, signatures
 
 ## Current status
 
-This repository is an early domain rewrite (`0.1.0`). The RFP-native core includes:
+This repository is an early public release (`0.1.0`). The RFP-native core includes:
 
 - firm onboarding checks;
 - configurable manual, RSS/Atom, and JSON discovery sources;
@@ -20,14 +20,15 @@ This repository is an early domain rewrite (`0.1.0`). The RFP-native core includ
 - explicit hard gates plus weighted bid/no-bid scoring;
 - source-grounded evaluation reports;
 - proposal workspaces with compliance matrices, clarification questions, drafts, and review checklists;
-- private user-layer boundaries suitable for a reusable public repository.
+- private user-layer boundaries suitable for a reusable public repository;
+- a generated read-only HTML pipeline dashboard.
 
-The inherited dashboard and some legacy files are still being replaced. Do not treat the legacy career test suite as consulting-ops release evidence.
+The initial release is intentionally smaller than the upstream project. PDF/DOCX export, paid tender-database integrations, email/calendar connectors, and richer procurement providers remain on the roadmap.
 
 ## Quick start
 
 ```powershell
-git clone <repository-url> consulting-ops
+git clone https://github.com/kelvinalfaro/consulting-ops.git
 cd consulting-ops
 npm install
 Copy-Item capability_statement.example.md capability_statement.md
