@@ -21,14 +21,14 @@ consulting-ops doctor
 
 For non-interactive setup, copy and edit `examples/onboarding-answers.example.json`, then run `consulting-ops onboard --answers <file> [--target <workspace>]`.
 
-`npm link` makes `consulting-ops` available in PowerShell, Command Prompt, Bash, zsh, and AI coding-tool terminals. If you prefer not to install a global link, use `npx consulting-ops <command>` or `npm run <script> -- <arguments>` from the repository.
+`npm link` makes `consulting-ops` available in PowerShell, Command Prompt, Bash, zsh, and AI coding-tool terminals. From a source checkout, use `node consulting-ops.mjs <command>` or `npm run <script> -- <arguments>`; do not rely on `npx` to resolve the current checkout.
 
 To bootstrap into a new folder from an already installed copy:
 
 ```powershell
 consulting-ops init my-consulting-ops
 cd my-consulting-ops
-npx consulting-ops onboard
+node consulting-ops.mjs onboard
 ```
 
 ## One-command workflow
@@ -130,6 +130,8 @@ This keeps paid databases, local credentials, and organization-specific connecto
 
 The scripts and Markdown/YAML contracts are the product API; no AI subscription is required. `AGENTS.md` provides the portable behavior baseline. Equivalent skill adapters are included for Codex/Agents, Claude, OpenCode, Antigravity, Qwen, Grok, and Kimi.
 
+From a source checkout, invoke the direct router with `node consulting-ops.mjs`. An empty invocation performs the readiness and update checks in one process and prints the concise command center; `node consulting-ops.mjs more` prints the full command reference.
+
 Example prompts:
 
 ```text
@@ -138,6 +140,8 @@ Run consulting-ops on this RFP and explain every unknown hard gate.
 Create the proposal workspace, then help me complete the compliance matrix using only approved evidence.
 Prepare finalist questions, but do not contact the issuer or submit anything.
 ```
+
+If Codex on Windows reports `codex-windows-sandbox-setup.exe` with `Access is denied (os error 5)`, run `codex doctor` and repair or restart the Codex sandbox environment. This is a Codex host-permissions problem, not a consulting-ops routing failure; do not disable sandboxing as the default workaround.
 
 ## Data model and safety
 

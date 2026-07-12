@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { getCommandCenterStatus, renderCommandCenter } from './lib/command-center.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 export const commands = {
@@ -22,11 +23,12 @@ export const artifactModes = new Set(['contact', 'email', 'contract', 'finalist'
 export const growthModes = new Set(['training', 'service', 'adjacent', 'jurisdiction']);
 export const operationalModes = new Set(['verify', 'normalize', 'dedup', 'stats', 'find', 'add', 'status', 'reconcile', 'liveness', 'inbox', 'quality']);
 
-function help() {
-  console.log(`consulting-ops -- Command Center
+export function fullHelp() {
+  return `consulting-ops -- Full Command Reference
 
 Available commands:
   consulting-ops <URL-or-file>  -> AUTO-PIPELINE: capture + extract + evaluate + tracker + conditional proposal
+  consulting-ops auto <source>  -> Run the auto-pipeline explicitly
   consulting-ops scan           -> Discover current consulting opportunities from configured sources
   consulting-ops pipeline       -> Process pending sources in data/rfp_pipeline.md
   consulting-ops evaluate       -> Bid/no-bid evaluation with hard gates and weighted fit
@@ -62,8 +64,21 @@ Available commands:
   consulting-ops adjacent       -> Assess adjacent opportunity and market targets
   consulting-ops jurisdiction   -> Calibrate eligibility and pursuit readiness for a procurement market
 
-Utilities: onboard, migrate, auto, capture, extract, batch, verify, normalize, dedup, reconcile, liveness, quality, stats, find, add, status, plugins, search-terms, and serve.
-The system never submits a proposal.`);
+  consulting-ops onboard        -> Configure the local workspace and prerequisites
+  consulting-ops batch          -> Process a supplied batch of solicitation sources
+
+Utilities: migrate, capture, extract, verify, normalize, dedup, reconcile, liveness, quality, stats, find, add, status, plugins, search-terms, and serve.
+The system never submits a proposal.`;
+}
+
+function help() {
+  console.log(fullHelp());
+}
+
+function commandCenter(args) {
+  const status = getCommandCenterStatus();
+  if (args.includes('--json')) console.log(JSON.stringify(status, null, 2));
+  else process.stdout.write(renderCommandCenter(status));
 }
 
 function run(script, args) {
@@ -86,7 +101,7 @@ function init(args) {
   if (result.status !== 0) process.exit(result.status ?? 1);
   result = spawnSync('npm', ['install'], { cwd: target, stdio: 'inherit', shell: process.platform === 'win32' });
   if (result.status !== 0) process.exit(result.status ?? 1);
-  console.log(`\nInstalled consulting-ops in ${target}\n\nNext:\n  cd ${target}\n  npx consulting-ops onboard`);
+  console.log(`\nInstalled consulting-ops in ${target}\n\nNext:\n  cd ${target}\n  node consulting-ops.mjs onboard`);
 }
 
 export function resolveRoute(mode, args = []) {
@@ -99,7 +114,8 @@ export function resolveRoute(mode, args = []) {
 
 function main() {
   const [mode, ...args] = process.argv.slice(2);
-  if (!mode || ['help', '-h', '--help'].includes(mode)) help();
+  if (!mode || mode === 'command-center') commandCenter(args);
+  else if (['help', 'more', '-h', '--help'].includes(mode)) help();
   else if (mode === 'init') init(args);
   else {
     const route = resolveRoute(mode, args);

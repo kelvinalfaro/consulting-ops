@@ -44,6 +44,10 @@ System files include scripts, shared modes, neutral templates, dashboard code, p
 
 ## Operating rules
 
+### Cold start and command center
+
+For an empty `consulting-ops` invocation, load the applicable skill and run `node consulting-ops.mjs` in the first tool batch. That single command owns doctor, update checking, readiness wording, and the concise menu. Return its output without separate readiness commands or intermediate interpretation. Use `node consulting-ops.mjs more` for the full reference.
+
 1. Run `node doctor.mjs --json` before a workflow and resolve missing prerequisites through onboarding.
 2. Preserve the original solicitation and every amendment. Normalized fields are working data, not replacements for source documents.
 3. Check deadline, eligibility, mandatory requirements, submission method, required attachments, page limits, and evaluation criteria before drafting.

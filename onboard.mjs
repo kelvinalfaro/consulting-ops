@@ -63,7 +63,7 @@ async function main() {
   answers.teaming_allowed = await ask('Allow teaming/subcontracting? yes/no', 'yes'); answers.certifications = await ask('Certifications, comma-separated');
   answers.classification_codes = await ask('NAICS or other classification codes, comma-separated');
   rl.close(); console.log('\n' + JSON.stringify(createOnboardingFiles(answers, { force: args.includes('--force'), root }), null, 2));
-  console.log('\nNext: review capability_statement.md, add case studies and team bios, then run `npx consulting-ops doctor`.');
+  console.log('\nNext: review capability_statement.md, add case studies and team bios, then run `node consulting-ops.mjs doctor`.');
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

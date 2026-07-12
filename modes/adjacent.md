@@ -6,7 +6,7 @@ Broaden discovery without turning aspiration into a capability claim.
 
 Require the capability statement, company profile, custom/profile modes, case studies, team evidence, current search configuration, tracker outcomes, and debrief patterns. Hard-stop if core firm evidence or targeting constraints are missing.
 
-Use `npx consulting-ops adjacent <market-or-service-family>` to create the assessment. Develop three categories:
+Use `node consulting-ops.mjs adjacent <market-or-service-family>` to create the assessment. Develop three categories:
 
 - **Close adjacency:** already supported by direct evidence, with a different buyer label or procurement category.
 - **Stretch adjacency:** plausible with a named evidence or teaming gap.

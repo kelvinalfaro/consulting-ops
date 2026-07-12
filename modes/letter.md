@@ -16,6 +16,6 @@ Before final prose, ask for: the pursuit angle; the problem the firm should emph
 
 ## Draft contract
 
-Use `npx consulting-ops letter <opportunity.yml>` for the workspace. Draft 300-500 words unless the solicitation specifies otherwise: issuer-specific opening; concise understanding of need; 2-4 supported qualifications or proof points; a bounded approach/value paragraph; and a direct close. Every material claim must map to an approved source. Avoid generic enthusiasm, invented metrics, unsupported client names, new scope promises, pricing, legal acceptance, or certifications.
+Use `node consulting-ops.mjs letter <opportunity.yml>` for the workspace. Draft 300-500 words unless the solicitation specifies otherwise: issuer-specific opening; concise understanding of need; 2-4 supported qualifications or proof points; a bounded approach/value paragraph; and a direct close. Every material claim must map to an approved source. Avoid generic enthusiasm, invented metrics, unsupported client names, new scope promises, pricing, legal acceptance, or certifications.
 
 Present the complete letter for review before export. Revise until the user approves the text. Never send, sign, or represent that the signer approved it.

@@ -2,7 +2,7 @@
 
 Load the solicitation, amendments, submitted proposal, evaluation criteria and weights, approved evidence, team roles, and confirmed event format. Hard-stop if the actual submitted response or event instructions are unavailable.
 
-Generate a worksheet with `npx consulting-ops finalist-practice <opportunity.yml>`. Build questions across understanding of need, approach, work plan, facilitation/coaching stance, team roles, past performance, risk, equity and participation, schedule, budget assumptions, difficult scenarios, and criterion-specific concerns.
+Generate a worksheet with `node consulting-ops.mjs finalist-practice <opportunity.yml>`. Build questions across understanding of need, approach, work plan, facilitation/coaching stance, team roles, past performance, risk, equity and participation, schedule, budget assumptions, difficult scenarios, and criterion-specific concerns.
 
 Run the session one question at a time:
 

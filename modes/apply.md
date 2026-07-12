@@ -6,7 +6,7 @@ This is the consulting-native equivalent of career-ops apply. It prepares and, w
 
 - Require the authoritative solicitation and amendments, a reviewed proposal workspace, completed compliance matrix, current attachment set, and confirmed submission channel.
 - Run proposal quality and submission readiness first. Unchecked requirements, unknown certifications, unresolved representations, missing attachments, or conflicting portal instructions are hard stops.
-- Generate `npx consulting-ops apply <workspace>` and use the field pack as the working record.
+- Generate `node consulting-ops.mjs apply <workspace>` and use the field pack as the working record.
 
 ## Field-by-field protocol
 
