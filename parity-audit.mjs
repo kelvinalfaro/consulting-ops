@@ -3,7 +3,7 @@
 /** Verify the documented consulting-ops capability surface and portable adapters. */
 
 import { existsSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const requiredFiles = [
@@ -15,6 +15,8 @@ const requiredFiles = [
   'dashboard-server.mjs', 'update-system.mjs', 'release-audit.mjs', 'ARCHITECTURE.md',
   'DATA_CONTRACT.md', 'PARITY.md', 'README.md', 'AGENTS.md', 'templates/states.yml', 'providers/_registry.mjs',
   'FLOW_PARITY.json',
+  'docs/CAREER_OPS_1_19_PORT.md', 'docs/CAREER_OPS_1_20_PORT.md',
+  'Consulting Ops - Ollama Qwen.cmd',
   'lib/command-center.mjs',
   'operational-tools.mjs', 'plugin-manager.mjs', 'agent-inbox.mjs', 'growth-assessment.mjs', 'submission-field-pack.mjs', 'evidence-intake.mjs', 'migrate-career-ops.mjs',
   'test-all.mjs',
@@ -46,8 +48,12 @@ export function auditParity(root = '.') {
   const canonicalSkill = readFileSync(resolve(root, '.agents/skills/consulting-ops/SKILL.md'), 'utf8');
   if (!canonicalSkill.includes('run exactly `node consulting-ops.mjs`')) failures.push('canonical skill lacks deterministic command-center route');
   if (canonicalSkill.includes('npx consulting-ops')) failures.push('canonical skill uses npx instead of the source router');
-  const claudeSkill = readFileSync(resolve(root, '.claude/skills/consulting-ops/SKILL.md'), 'utf8');
-  if (!claudeSkill.startsWith('---') || !claudeSkill.includes('run exactly `node consulting-ops.mjs`')) failures.push('Claude adapter is not self-contained');
+  const claudePath = resolve(root, '.claude/skills/consulting-ops/SKILL.md');
+  const claudeEntry = readFileSync(claudePath, 'utf8').trim();
+  const claudeSkill = claudeEntry.split(/\r?\n/).length === 1 && claudeEntry.endsWith('.md')
+    ? readFileSync(resolve(dirname(claudePath), claudeEntry), 'utf8')
+    : claudeEntry;
+  if (!claudeSkill.startsWith('---') || !claudeSkill.includes('run exactly `node consulting-ops.mjs`')) failures.push('Claude adapter does not resolve to the canonical skill');
   for (const mode of routedModeFiles) if (!existsSync(resolve(root, `modes/${mode}.md`))) failures.push(`missing routed mode instructions: modes/${mode}.md`);
   const cli = readFileSync(resolve(root, 'consulting-ops.mjs'), 'utf8');
   for (const command of commands) if (!cli.includes(`${command}:`) && !cli.includes(`'${command}':`) && !cli.includes(`'${command}'`)) failures.push(`missing CLI command: ${command}`);

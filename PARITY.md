@@ -33,6 +33,19 @@ Consulting-ops also adds amendment capture, mandatory-requirement hard gates, qu
 
 The executable audit is `npm run audit:parity`. Tests and packaging checks are separate evidence; this matrix is not a substitute for them.
 
+The feature-level review of career-ops 1.19.0 is recorded in
+[`docs/CAREER_OPS_1_19_PORT.md`](docs/CAREER_OPS_1_19_PORT.md). It adds budget
+reliability, freshness and issuer exclusions, evidence-metric validation,
+pursuit-funnel calibration, configurable extraction limits, and local Ollama/Qwen
+evaluation without importing job-only behavior.
+
+The feature-level review of career-ops 1.20.0 is recorded in
+[`docs/CAREER_OPS_1_20_PORT.md`](docs/CAREER_OPS_1_20_PORT.md). The release's
+targeted upskill fix has no current consulting runtime analog, so the review
+records canonical capability matching and redirect revalidation as acceptance
+criteria for a future evidence-grounded capability-gap analyzer. Career-only
+manifesto and signature automation are intentionally excluded.
+
 ## Command-center acceptance standard
 
 The no-argument skill flow must match career-ops operationally: run doctor and update checks, report readiness, and display the complete consulting-native command menu. Every advertised command must have a CLI route and mode instructions where agent judgment is required. The parity audit checks this surface across all shipped AI adapters.

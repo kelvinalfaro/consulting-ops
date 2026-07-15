@@ -8,7 +8,8 @@ import { fileURLToPath } from 'node:url';
 import yaml from 'js-yaml';
 import { pendingItems, pendingUrls } from './process-pipeline.mjs';
 import { readTracker, writeTracker, normalizeState, setTrackedStatus, upsertOpportunity } from './lib/tracker-store.mjs';
-import { trackerMetrics } from './lib/rfp-tracker.mjs';
+import { pursuitFunnel, trackerMetrics } from './lib/rfp-tracker.mjs';
+import { verifyWorkspace } from './verify-proposal-claims.mjs';
 
 function structured(path) {
   const text = readFileSync(path, 'utf8');
@@ -110,7 +111,11 @@ export function qualityCheck(workspace) {
   const missing = required.filter((file) => !existsSync(join(workspace, file)));
   const draft = existsSync(join(workspace, 'proposal-draft.md')) ? readFileSync(join(workspace, 'proposal-draft.md'), 'utf8') : '';
   const placeholders = (draft.match(/\[[^\]\n]{3,}\]/g) ?? []).length;
-  return { ready: missing.length === 0 && placeholders === 0, missing, placeholders, submission_authorized: false };
+  let claims = { valid: false, unsupported: [], claims: [] };
+  if (!missing.includes('proposal-draft.md')) {
+    try { claims = verifyWorkspace(workspace); } catch { /* reported by ordinary workspace checks */ }
+  }
+  return { ready: missing.length === 0 && placeholders === 0 && claims.valid, missing, placeholders, unsupported_metrics: claims.unsupported, submission_authorized: false };
 }
 
 async function run(command, args) {
@@ -123,7 +128,7 @@ async function run(command, args) {
   if (command === 'dedup') { const result = deduplicateTracker(rows); if (!args.includes('--dry-run')) writeTracker(result.rows, trackerPath); return { ...result, rows: result.rows.length, dry_run: args.includes('--dry-run') }; }
   if (command === 'stats') {
     const runsPath = resolve('data/scan-runs.tsv');
-    return { metrics: trackerMetrics(rows), statuses: Object.fromEntries([...new Set(rows.map((r) => r.status))].map((status) => [status, rows.filter((r) => r.status === status).length])), scan_runs: scanRunSummary(existsSync(runsPath) ? readFileSync(runsPath, 'utf8') : '') };
+    return { metrics: trackerMetrics(rows), funnel: pursuitFunnel(rows), statuses: Object.fromEntries([...new Set(rows.map((r) => r.status))].map((status) => [status, rows.filter((r) => r.status === status).length])), scan_runs: scanRunSummary(existsSync(runsPath) ? readFileSync(runsPath, 'utf8') : '') };
   }
   if (command === 'find') return { query: args.join(' '), rows: findTracker(rows, args.join(' ')) };
   if (command === 'add') return upsertOpportunity(structured(resolve(args[0])), {}, trackerPath);

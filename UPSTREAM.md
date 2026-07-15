@@ -12,3 +12,13 @@ for `consulting-ops`.
 
 The original copyright and permission notice remain in `LICENSE`. Git history or
 release notes should continue to make the upstream relationship clear.
+
+The 2026-07-14 parity pass reviewed career-ops 1.19.0 and translated applicable
+features into RFP-native controls. See [docs/CAREER_OPS_1_19_PORT.md](docs/CAREER_OPS_1_19_PORT.md)
+for the mapping and intentionally excluded job-only features.
+
+The 2026-07-15 parity pass reviewed career-ops 1.20.0. No new RFP runtime
+capability required a direct port; the targeted upskill correction became a
+roadmap contract for future evidence-grounded capability-gap analysis, while
+CareerOps manifesto and signature automation remained upstream-specific. See
+[docs/CAREER_OPS_1_20_PORT.md](docs/CAREER_OPS_1_20_PORT.md).

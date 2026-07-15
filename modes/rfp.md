@@ -32,7 +32,7 @@ Outline a credible engagement approach without writing a full proposal. Identify
 
 ### E. Commercial and delivery feasibility
 
-Assess budget information, effort drivers, schedule, staffing, travel, dependencies, pricing format, payment terms, and capacity. Pricing recommendations require human review.
+Assess budget information, its reliability tier, any gap against the configured minimum engagement size, effort drivers, schedule, staffing, travel, dependencies, pricing format, payment terms, and capacity. A stated ceiling is not automatically guaranteed revenue. Pricing recommendations require human review.
 
 ### F. Win conditions and risks
 

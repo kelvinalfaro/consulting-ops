@@ -1,6 +1,6 @@
 ---
 name: consulting-ops
-description: Consulting RFP command center. For an empty invocation, load this skill and run `node consulting-ops.mjs` in the first tool batch; return its output without separate doctor/update calls or intermediate interpretation.
+description: Consulting RFP command center. Execute the requested consulting-ops command immediately; do not substitute repository analysis.
 arguments: mode
 user_invocable: true
 user-invocable: true
@@ -10,18 +10,17 @@ license: MIT
 
 # consulting-ops router
 
-Read `AGENTS.md`. Use the repository's direct Node router; do not invoke a package resolver from a source checkout.
+## Execution rule
 
-## Invocation
+When this skill is invoked, do not inspect Git history, summarize repository changes, search for unrelated work, or explain what you plan to do. Use the Bash tool to run the routed command immediately, wait for it to finish, and return its actual output.
 
-- Empty invocation: run exactly `node consulting-ops.mjs`, then return its command-center output without running doctor or update separately.
-- `help` or `more`: run `node consulting-ops.mjs more`.
-- A mode: after the readiness check required by `AGENTS.md`, run `node consulting-ops.mjs <mode> [arguments]`.
-- An RFP/RFQ URL or file with no mode: run `node consulting-ops.mjs <source>` for the auto-pipeline.
-- If a command produces no output, treat that as an error to diagnose; do not silently invent a result.
+- Empty invocation: run exactly `node consulting-ops.mjs` without running doctor or update separately; that router owns both checks.
+- `help` or `more`: run exactly `node consulting-ops.mjs more`.
+- Any mode and arguments: run exactly `node consulting-ops.mjs <mode> [arguments]`.
+- An RFP/RFQ URL or file with no mode: run exactly `node consulting-ops.mjs <source>`.
 
-## Context loading
+If the command requires missing input, ask only for that input. If it fails, report the command and error; do not invent a substitute result.
 
-For auto-pipeline, evaluate, proposal, pipeline, scan, batch, and amend, read `modes/_shared_rfp.md` plus the relevant mode file. For other modes, read the matching mode file when agent judgment is required.
+## Safety
 
-Never invent qualifications, silently accept amendment changes, send correspondence, sign, certify, or submit a response. The user performs final submission.
+Read and obey `AGENTS.md`. Never invent qualifications, silently accept amendment changes, send correspondence, sign, certify, or submit a response. The user performs final submission.

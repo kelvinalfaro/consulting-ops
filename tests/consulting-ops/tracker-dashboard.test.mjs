@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseTracker, renderTracker, trackerMetrics } from '../../lib/rfp-tracker.mjs';
+import { parseTracker, pursuitFunnel, renderTracker, trackerMetrics } from '../../lib/rfp-tracker.mjs';
 import { renderDashboard } from '../../build-dashboard.mjs';
 
 const markdown = `# Tracker
@@ -18,6 +18,11 @@ test('parses RFP tracker and computes pursuit metrics', () => {
   assert.equal(metrics.active, 1);
   assert.equal(metrics.won, 1);
   assert.equal(metrics.win_rate, 100);
+  const funnel = pursuitFunnel(rows);
+  assert.equal(funnel.bid, 2);
+  assert.equal(funnel.submitted, 1);
+  assert.equal(funnel.won, 1);
+  assert.equal(funnel.small_sample, true);
 });
 
 test('tracker render round-trips canonical columns', () => {

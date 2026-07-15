@@ -55,6 +55,7 @@ consulting-ops capture <source>                Preserve source and create a reco
 consulting-ops extract <record>                Extract dates, requirements, criteria, contacts
 consulting-ops amend <record> <source>          Preserve amendment and flag changed fields
 consulting-ops evaluate <record>               Run hard gates and weighted bid/no-bid scoring
+npm run ollama:eval -- --file <rfp.txt>        Run a private local Qwen/Ollama review
 consulting-ops compare <records...>             Compare pursuit choices
 consulting-ops proposal <record>               Create compliance-first proposal workspace
 consulting-ops evidence <record>               Create a claim evidence register
@@ -131,6 +132,8 @@ This keeps paid databases, local credentials, and organization-specific connecto
 The scripts and Markdown/YAML contracts are the product API; no AI subscription is required. `AGENTS.md` provides the portable behavior baseline. Equivalent skill adapters are included for Codex/Agents, Claude, OpenCode, Antigravity, Qwen, Grok, and Kimi.
 
 From a source checkout, invoke the direct router with `node consulting-ops.mjs`. An empty invocation performs the readiness and update checks in one process and prints the concise command center; `node consulting-ops.mjs more` prints the full command reference.
+
+On Windows, double-click `Consulting Ops - Ollama Qwen.cmd` to choose tested Codex + local Qwen, experimental Claude Code + Qwen, plain Ollama chat, or Google Antigravity (`agy`). The Antigravity path is independent of Ollama and opens in the repository root so `/consulting-ops` can load the bundled skill.
 
 Example prompts:
 

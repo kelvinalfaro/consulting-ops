@@ -105,6 +105,7 @@ export function classifyItem(item, filters = {}) {
     'bid postings', 'government bids opportunities', 'goods & services rfps',
   ];
   const excludedDomains = filters.exclude_domains ?? ['wikipedia.org', 'investopedia.com', 'indeed.com/career-advice'];
+  const blacklistedIssuers = filters.blacklist_issuers ?? [];
   const included = !include.length || include.some((term) => matchesTerm(haystack, term));
   const excluded = exclude.some((term) => matchesTerm(haystack, term));
   const opportunityLike = opportunityTerms.some((term) => matchesTerm(haystack, term));
@@ -112,13 +113,24 @@ export function classifyItem(item, filters = {}) {
   const procurementPortal = portalTerms.some((term) => matchesTerm(haystack, term));
   const targetDomain = domainTerms.some((term) => matchesTerm(haystack, term));
   const excludedDomain = excludedDomains.some((domain) => item.url?.toLowerCase().includes(String(domain).toLowerCase()));
+  const blacklistedIssuer = blacklistedIssuers.some((issuer) => matchesTerm(String(item.issuer ?? '').toLowerCase(), issuer));
   const deadline = item.deadline ? new Date(item.deadline) : null;
   const expired = deadline && !Number.isNaN(deadline.valueOf()) && deadline < new Date(new Date().toISOString().slice(0, 10));
-  if (excluded || informational || excludedDomain || expired) return 'reject';
+  const published = item.published ? new Date(item.published) : null;
+  const maxAge = Number(filters.max_posting_age_days);
+  const stale = Number.isFinite(maxAge) && maxAge > 0 && published && !Number.isNaN(published.valueOf())
+    && published < new Date(Date.now() - maxAge * 86400000);
+  if (excluded || informational || excludedDomain || blacklistedIssuer || expired || stale) return 'reject';
   if (procurementPortal) return 'source_lead';
   if (!opportunityLike) return 'reject';
   if (!targetDomain && included) return 'source_lead';
   return targetDomain ? 'opportunity' : 'reject';
+}
+
+export function parseIssuerBlacklist(markdown = '') {
+  return markdown.split(/\r?\n/)
+    .map((line) => line.match(/^\s*[-*]\s+(?:\[[ xX]\]\s*)?(.+?)\s*$/)?.[1]?.trim())
+    .filter(Boolean);
 }
 
 export function keywordMatch(item, filters = {}) {
@@ -195,6 +207,9 @@ export async function scan(config, options = {}) {
   const current = existsSync(pipelinePath) ? readFileSync(pipelinePath, 'utf8') : '# RFP pipeline\n\n## Pending\n\n## Processed\n';
   const seen = existingUrls(current);
   const providers = options.providers ?? await loadProviderPlugins(options.providerRoots ?? ['providers', 'plugins.local']);
+  const blacklistPath = resolve(options.blacklistPath ?? 'data/blacklist.md');
+  const blacklistIssuers = options.blacklistIssuers ?? (existsSync(blacklistPath) ? parseIssuerBlacklist(readFileSync(blacklistPath, 'utf8')) : []);
+  const filters = { ...(config.filters ?? {}), blacklist_issuers: [...(config.filters?.blacklist_issuers ?? []), ...blacklistIssuers] };
   const found = [];
   const sourceLeads = [];
   const errors = [];
@@ -207,7 +222,7 @@ export async function scan(config, options = {}) {
       const items = await fetchSource(source, config, providers);
       for (const item of items) {
         scanned += 1;
-        const classification = classifyItem(item, config.filters);
+        const classification = classifyItem(item, filters);
         if (classification === 'reject') { rejected += 1; continue; }
         if (seen.has(item.url)) { duplicates += 1; continue; }
         if (!seen.has(item.url)) {

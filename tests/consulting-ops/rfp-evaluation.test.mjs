@@ -68,3 +68,11 @@ test('unknown budget remains an explicit information gap without fabricating an 
   assert.ok(result.information_gaps.includes('budget'));
   assert.equal(opportunity.budget.amount, null);
 });
+
+test('stated fixed budget receives a high reliability tier and checks the firm minimum', () => {
+  const opportunity = completeOpportunity({ budget: { stated: true, amount: 75000, currency: 'USD', type: 'not-to-exceed' } });
+  const profile = { target_engagements: { minimum_budget: 100000 }, commercial: { currency: 'USD' } };
+  const result = evaluateOpportunity(opportunity, profile, { now });
+  assert.equal(result.budget_reliability.tier, 'High');
+  assert.equal(result.budget_reliability.below_minimum, true);
+});

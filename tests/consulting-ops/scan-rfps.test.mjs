@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { appendScanRun, classifyItem, existingUrls, insertPending, insertSourceLeads, keywordMatch, parseFeed, parseJsonFeed, repairText, SCAN_RUNS_HEADER } from '../../scan-rfps.mjs';
+import { appendScanRun, classifyItem, existingUrls, insertPending, insertSourceLeads, keywordMatch, parseFeed, parseIssuerBlacklist, parseJsonFeed, repairText, SCAN_RUNS_HEADER } from '../../scan-rfps.mjs';
 import { mkdtempSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -58,4 +58,11 @@ test('scan run history appends an auditable row with a single header', () => {
   assert.equal(lines[0], SCAN_RUNS_HEADER.trim());
   assert.equal(lines.length, 3);
   assert.match(lines[2], /\tpartial\t/);
+});
+
+test('freshness and private issuer blacklist filters reject stale or do-not-bid opportunities', () => {
+  const filters = { include_terms: ['consulting'], max_posting_age_days: 30, blacklist_issuers: ['Blocked Agency'] };
+  assert.equal(classifyItem({ title: 'Strategic Planning Consulting RFP', issuer: 'City', url: 'https://city.gov/old', published: '2020-01-01' }, filters), 'reject');
+  assert.equal(classifyItem({ title: 'Strategic Planning Consulting RFP', issuer: 'Blocked Agency', url: 'https://agency.gov/rfp' }, filters), 'reject');
+  assert.deepEqual(parseIssuerBlacklist('# Do not bid\n\n- Blocked Agency\n- [ ] Another Issuer'), ['Blocked Agency', 'Another Issuer']);
 });

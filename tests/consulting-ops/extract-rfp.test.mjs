@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { extractOpportunityFields, htmlToText, mergeExtractedFields } from '../../lib/extract-rfp.mjs';
+import { extractRecord } from '../../extract-rfp.mjs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
 test('extracts core procurement fields from solicitation text', () => {
   const text = `REQUEST FOR PROPOSALS: Strategic Planning Services
@@ -34,4 +38,17 @@ test('merge preserves reviewed fields over machine extraction', () => {
     title: 'Machine title', submission: {}, mandatory_requirements: [], required_attachments: [], evaluation_criteria: [], extraction: {},
   });
   assert.equal(result.title, 'Reviewed title');
+});
+
+test('configurable analysis cap preserves the full authoritative source text', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'consulting-extract-cap-'));
+  const recordDir = join(root, 'RFP-1');
+  mkdirSync(recordDir);
+  const source = 'REQUEST FOR PROPOSALS\n' + 'x'.repeat(5000);
+  writeFileSync(join(recordDir, 'source.md'), source);
+  writeFileSync(join(recordDir, 'opportunity.yml'), 'id: RFP-1\nsource_file: source.md\n');
+  const result = await extractRecord(join(recordDir, 'opportunity.yml'), { maxChars: 100 });
+  assert.equal(readFileSync(result.source_text, 'utf8'), source);
+  assert.equal(result.opportunity.extraction.analyzed_characters, 100);
+  assert.equal(result.opportunity.extraction.truncated_for_analysis, true);
 });

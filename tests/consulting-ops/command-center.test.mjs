@@ -61,7 +61,11 @@ test('full help retains every contracted command while the primary menu stays bo
 
 test('skills pin the direct router and forbid separate startup checks', () => {
   for (const relative of ['.agents/skills/consulting-ops/SKILL.md', '.claude/skills/consulting-ops/SKILL.md']) {
-    const skill = readFileSync(resolve(root, relative), 'utf8');
+    const entryPath = resolve(root, relative);
+    const entry = readFileSync(entryPath, 'utf8').trim();
+    const skill = entry.split(/\r?\n/).length === 1 && entry.endsWith('.md')
+      ? readFileSync(resolve(dirname(entryPath), entry), 'utf8')
+      : entry;
     assert.match(skill, /run exactly `node consulting-ops\.mjs`/);
     assert.match(skill, /without running doctor or update separately/);
     assert.doesNotMatch(skill, /npx consulting-ops/);

@@ -28,4 +28,8 @@ sources:
 filters:
   include_terms: ["consulting", "coaching", "facilitation"]
   exclude_terms: []
+  # Optional freshness gate. Undated opportunities remain eligible for review.
+  max_posting_age_days: 120
+  # Issuers can also be listed one per bullet in private data/blacklist.md.
+  blacklist_issuers: []
   countries: ["United States"]
