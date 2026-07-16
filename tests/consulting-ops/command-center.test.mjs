@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fullHelp } from '../../consulting-ops.mjs';
@@ -33,7 +33,7 @@ test('command center stops at onboarding guidance when prerequisites are missing
   const text = renderCommandCenter(status);
   assert.equal(status.ready, false);
   assert.match(text, /Setup required/);
-  assert.match(text, /node consulting-ops\.mjs onboard/);
+  assert.match(text, /consulting-ops setup/);
   assert.doesNotMatch(text, /- scan/);
 });
 
@@ -59,16 +59,16 @@ test('full help retains every contracted command while the primary menu stays bo
   assert.match(result.stdout, /Full Command Reference/);
 });
 
-test('skills pin the direct router and forbid separate startup checks', () => {
-  for (const relative of ['.agents/skills/consulting-ops/SKILL.md', '.claude/skills/consulting-ops/SKILL.md']) {
+test('concierge skills use the installed engine and portable workspace resolution', () => {
+  for (const relative of ['.agents/skills/consulting-concierge/SKILL.md', '.claude/skills/consulting-concierge/SKILL.md']) {
     const entryPath = resolve(root, relative);
     const entry = readFileSync(entryPath, 'utf8').trim();
     const skill = entry.split(/\r?\n/).length === 1 && entry.endsWith('.md')
       ? readFileSync(resolve(dirname(entryPath), entry), 'utf8')
       : entry;
-    assert.match(skill, /run exactly `node consulting-ops\.mjs`/);
-    assert.match(skill, /without running doctor or update separately/);
-    assert.doesNotMatch(skill, /npx consulting-ops/);
+    assert.match(skill, /consulting-ops doctor --json/);
+    assert.match(skill, /configured private workspace/);
+    assert.doesNotMatch(skill, /node consulting-ops\.mjs/);
   }
 });
 
@@ -86,4 +86,13 @@ test('direct tracker route preserves command output and exit status', () => {
   const payload = JSON.parse(result.stdout);
   assert.ok(Array.isArray(payload.rows));
   assert.equal(typeof payload.metrics.total, 'number');
+});
+
+test('router entry detection accepts a linked executable path', () => {
+  const linkRoot = resolve(root, 'node_modules', '.bin');
+  const executable = process.platform === 'win32' ? resolve(linkRoot, 'consulting-ops.cmd') : resolve(linkRoot, 'consulting-ops');
+  if (!existsSync(executable)) return;
+  const result = spawnSync(executable, ['more'], { cwd: root, encoding: 'utf8', shell: process.platform === 'win32' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Full Command Reference/);
 });

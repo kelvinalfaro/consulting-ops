@@ -47,7 +47,7 @@ async function main() {
   const targetIndex = args.indexOf('--target');
   const root = targetIndex >= 0 && args[targetIndex + 1] ? resolve(args[targetIndex + 1]) : resolve('.');
   if (answersIndex >= 0 && args[answersIndex + 1]) {
-    const answers = JSON.parse(readFileSync(resolve(args[answersIndex + 1]), 'utf8'));
+    const answers = JSON.parse(readFileSync(resolve(args[answersIndex + 1]), 'utf8').replace(/^\uFEFF/, ''));
     console.log(JSON.stringify(createOnboardingFiles(answers, { force: args.includes('--force'), root }), null, 2)); return;
   }
   const rl = createInterface({ input, output });

@@ -2,6 +2,13 @@
 
 All notable changes are documented here. This project follows semantic versioning.
 
+## 0.4.0 — 2026-07-16
+
+- Added a persistent external-workspace resolver and `consulting-ops setup` installer.
+- Added the AI-agnostic `consulting-concierge` skill as the recommended product interface, with portable, Codex, Gemini CLI, and Claude Code install targets.
+- Separated updateable system code from private firm data without synchronized disposable runtimes.
+- Kept the deterministic CLI as the core and retained the older `consulting-ops` skill as a compatibility alias.
+
 ## 0.3.0 — 2026-07-14
 
 - Ported applicable career-ops 1.19.0 capabilities into RFP-native budget reliability, freshness and issuer exclusions, pursuit-funnel metrics, configurable extraction limits, and proposal metric validation.

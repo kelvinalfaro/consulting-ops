@@ -1,6 +1,6 @@
 ---
 name: consulting-ops
-description: Consulting RFP command center. For an empty invocation, load this skill and run `node consulting-ops.mjs` in the first tool batch; return its output without separate doctor/update calls or intermediate interpretation.
+description: Legacy compatibility router. Use only when the user explicitly asks for the consulting-ops skill or a raw Consulting Ops CLI command; use consulting-concierge for normal consulting opportunity and proposal work.
 arguments: mode
 user_invocable: true
 user-invocable: true
@@ -8,20 +8,20 @@ argument-hint: "[RFP URL/file | scan | pipeline | tracker | evaluate | proposal 
 license: MIT
 ---
 
-# consulting-ops router
+# Consulting Ops legacy router
 
-Read `AGENTS.md`. Use the repository's direct Node router; do not invoke a package resolver from a source checkout.
+Prefer the `consulting-concierge` skill. This alias preserves older explicit invocations.
 
 ## Invocation
 
-- Empty invocation: run exactly `node consulting-ops.mjs`, then return its command-center output without running doctor or update separately.
-- `help` or `more`: run `node consulting-ops.mjs more`.
-- A mode: after the readiness check required by `AGENTS.md`, run `node consulting-ops.mjs <mode> [arguments]`.
-- An RFP/RFQ URL or file with no mode: run `node consulting-ops.mjs <source>` for the auto-pipeline.
+- Empty invocation: run exactly `consulting-ops`.
+- `help` or `more`: run `consulting-ops more`.
+- A mode: run `consulting-ops <mode> [arguments]`.
+- An RFP/RFQ URL or file with no mode: run `consulting-ops <source>`.
 - If a command produces no output, treat that as an error to diagnose; do not silently invent a result.
 
 ## Context loading
 
-For auto-pipeline, evaluate, proposal, pipeline, scan, batch, and amend, read `modes/_shared_rfp.md` plus the relevant mode file. For other modes, read the matching mode file when agent judgment is required.
+The installed CLI owns workspace resolution and system instructions.
 
 Never invent qualifications, silently accept amendment changes, send correspondence, sign, certify, or submit a response. The user performs final submission.

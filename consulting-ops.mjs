@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, realpathSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getCommandCenterStatus, renderCommandCenter } from './lib/command-center.mjs';
+import { extractWorkspaceArgs, resolveWorkspace } from './lib/workspace.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 export const commands = {
@@ -58,6 +59,7 @@ Available commands:
   consulting-ops patterns       -> Analyze win/loss/no-bid patterns
   consulting-ops dashboard      -> Build the local pursuit dashboard
   consulting-ops doctor         -> Validate setup and prerequisites
+  consulting-ops setup          -> Create/select a private workspace and install the concierge skill
   consulting-ops update         -> Preview/apply system updates safely
   consulting-ops training       -> Assess a course or credential against firm strategy
   consulting-ops service        -> Assess a new consulting service or portfolio offering
@@ -75,33 +77,23 @@ function help() {
   console.log(fullHelp());
 }
 
-function commandCenter(args) {
-  const status = getCommandCenterStatus();
+function commandCenter(args, workspace) {
+  const status = getCommandCenterStatus({ cwd: workspace });
   if (args.includes('--json')) console.log(JSON.stringify(status, null, 2));
   else process.stdout.write(renderCommandCenter(status));
 }
 
-function run(script, args) {
+function run(script, args, workspace = process.cwd()) {
   const path = resolve(root, script);
   if (!existsSync(path)) {
     console.error(`Mode is planned but not installed in this version: ${script}`);
     process.exit(2);
   }
-  const result = spawnSync(process.execPath, [path, ...args], { cwd: process.cwd(), stdio: 'inherit', env: process.env });
+  const result = spawnSync(process.execPath, [path, ...args], {
+    cwd: workspace, stdio: 'inherit', env: { ...process.env, CONSULTING_OPS_WORKSPACE: workspace },
+  });
   if (result.error) throw result.error;
   process.exit(result.status ?? 1);
-}
-
-function init(args) {
-  const target = resolve(args[0] ?? 'consulting-ops');
-  if (existsSync(target)) throw new Error(`Target already exists: ${target}`);
-  let result = spawnSync('git', ['clone', '--depth', '1', 'https://github.com/kelvinalfaro/consulting-ops.git', target], {
-    stdio: 'inherit', shell: process.platform === 'win32',
-  });
-  if (result.status !== 0) process.exit(result.status ?? 1);
-  result = spawnSync('npm', ['install'], { cwd: target, stdio: 'inherit', shell: process.platform === 'win32' });
-  if (result.status !== 0) process.exit(result.status ?? 1);
-  console.log(`\nInstalled consulting-ops in ${target}\n\nNext:\n  cd ${target}\n  node consulting-ops.mjs onboard`);
 }
 
 export function resolveRoute(mode, args = []) {
@@ -113,16 +105,21 @@ export function resolveRoute(mode, args = []) {
 }
 
 function main() {
-  const [mode, ...args] = process.argv.slice(2);
-  if (!mode || mode === 'command-center') commandCenter(args);
+  const raw = process.argv.slice(2);
+  const [rawMode, ...rawArgs] = raw;
+  if (rawMode === 'setup') return run('setup.mjs', rawArgs);
+  if (rawMode === 'init') return run('setup.mjs', ['--workspace', rawArgs[0] ?? 'consulting-ops-workspace', ...rawArgs.slice(1)]);
+  const { workspace: explicit, args: cleaned } = extractWorkspaceArgs(raw);
+  const workspace = resolveWorkspace({ explicit, env: process.env });
+  const [mode, ...args] = cleaned;
+  if (!mode || mode === 'command-center') commandCenter(args, workspace);
   else if (['help', 'more', '-h', '--help'].includes(mode)) help();
-  else if (mode === 'init') init(args);
   else {
     const route = resolveRoute(mode, args);
-    run(route.script, route.args);
+    run(route.script, route.args, workspace);
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (process.argv[1] && realpathSync(resolve(process.argv[1])) === realpathSync(fileURLToPath(import.meta.url))) {
   try { main(); } catch (error) { console.error(error.message); process.exit(1); }
 }

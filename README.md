@@ -15,21 +15,28 @@ git clone https://github.com/kelvinalfaro/consulting-ops.git
 cd consulting-ops
 npm install
 npm link
-consulting-ops onboard
-consulting-ops doctor
+consulting-ops setup
 ```
 
-For non-interactive setup, copy and edit `examples/onboarding-answers.example.json`, then run `consulting-ops onboard --answers <file> [--target <workspace>]`.
+`setup` asks where private firm and pursuit data should live, creates or onboards that external workspace, saves it as the default, installs the AI-agnostic `consulting-concierge` skill, and runs the setup doctor. The cloned repository remains updateable system code; private data is not placed in it.
+
+For non-interactive setup, copy and edit `examples/onboarding-answers.example.json`, then run:
+
+```powershell
+consulting-ops setup --workspace <private-folder> --answers <file> --yes --agent all
+```
+
+The default `--agent portable` installs to `~/.agents/skills`, which Gemini CLI also discovers. `--agent all` additionally installs native user-scope copies for Codex, Gemini CLI, and Claude Code. Use `portable`, `codex`, `gemini`, or `claude` for a single target.
 
 `npm link` makes `consulting-ops` available in PowerShell, Command Prompt, Bash, zsh, and AI coding-tool terminals. From a source checkout, use `node consulting-ops.mjs <command>` or `npm run <script> -- <arguments>`; do not rely on `npx` to resolve the current checkout.
 
-To bootstrap into a new folder from an already installed copy:
+To create a new private workspace from an already installed copy:
 
 ```powershell
 consulting-ops init my-consulting-ops
-cd my-consulting-ops
-node consulting-ops.mjs onboard
 ```
+
+The CLI resolves the workspace from `--workspace`, then `CONSULTING_OPS_WORKSPACE`, then the saved user configuration, and finally the current directory for backward compatibility.
 
 ## One-command workflow
 
@@ -45,7 +52,8 @@ The auto-pipeline preserves the source, extracts procurement facts, evaluates ha
 ## Command center
 
 ```text
-consulting-ops onboard                         Create private firm-layer files safely
+consulting-ops setup                           Configure workspace, onboarding, and skill installation
+consulting-ops onboard                         Create private firm-layer files safely in a target workspace
 consulting-ops doctor                          Validate setup and boundaries
 consulting-ops <URL-or-file>                   Run the complete auto-pipeline
 consulting-ops scan                            Discover from configured sources/providers
@@ -102,7 +110,7 @@ Run `consulting-ops --help` for the compact reference. Each command is also expo
 
 ## Onboarding and private data
 
-`consulting-ops onboard` creates missing files from neutral examples and never overwrites existing firm data by default. Complete:
+`consulting-ops setup` is the recommended entry point. The lower-level `consulting-ops onboard` command creates missing files from neutral examples and never overwrites existing firm data by default. Complete:
 
 - `capability_statement.md`
 - `config/company_profile.yml`
@@ -129,11 +137,11 @@ This keeps paid databases, local credentials, and organization-specific connecto
 
 ## Use with AI coding assistants
 
-The scripts and Markdown/YAML contracts are the product API; no AI subscription is required. `AGENTS.md` provides the portable behavior baseline. Equivalent skill adapters are included for Codex/Agents, Claude, OpenCode, Antigravity, Qwen, Grok, and Kimi.
+The scripts and Markdown/YAML contracts are the product API; no AI subscription is required. `consulting-concierge` is the recommended conversational product surface, while the CLI remains the deterministic engine. The skill follows the open Agent Skills layout and is usable by Gemini CLI through its `.agents/skills` alias; native adapters are also included for supported agents.
 
 From a source checkout, invoke the direct router with `node consulting-ops.mjs`. An empty invocation performs the readiness and update checks in one process and prints the concise command center; `node consulting-ops.mjs more` prints the full command reference.
 
-On Windows, double-click `Consulting Ops - Ollama Qwen.cmd` to choose tested Codex + local Qwen, experimental Claude Code + Qwen, plain Ollama chat, or Google Antigravity (`agy`). The Antigravity path is independent of Ollama and opens in the repository root so `/consulting-ops` can load the bundled skill.
+Use the bundled `consulting-concierge` skill. The older `consulting-ops` skill remains only as an explicit compatibility alias. Windows-specific launchers and disposable synchronized runtimes are intentionally not part of the product surface.
 
 Example prompts:
 

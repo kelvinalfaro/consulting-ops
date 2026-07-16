@@ -1,8 +1,18 @@
 # consulting-ops project log
 
+## 2026-07-16 - Public external-workspace installer and concierge architecture
+
+**Objective:** Make the public product install like Kelvin's separated setup while remaining AI-agent agnostic.
+
+**Completed:** Added persistent workspace resolution, `consulting-ops setup`, portable/native Agent Skill installation, and the bundled `consulting-concierge` primary interface. System assets now resolve from the package while private files resolve from the configured workspace. This supersedes the disposable-runtime synchronization approach described in older entries; those runtime copies are no longer part of the intended product architecture.
+
+**Validation:** A clean temporary install created and onboarded an external workspace, installed the skill to portable, Codex, Gemini, and Claude locations, and ran doctor and tracker successfully. The full test, parity, release/privacy, tracker, and package gates passed.
+
 ## 2026-07-15 - Google Antigravity launcher option
 
 **Objective:** Make the existing Consulting Ops and Career Ops Windows launchers able to open either the local Ollama/Qwen paths or Google Antigravity.
+
+**Later decision:** The local Windows launchers were retired in favor of the shared `career-concierge` and `consulting-concierge` skills. The package inventory, parity audit, and README no longer require or advertise the Consulting Ops launcher. Private Consulting Ops data now lives at `G:\Shared drives\Consulting\Alfaro Consulting\consulting-ops`; the local repository is system-only and a disposable local runtime receives synchronized user data for execution.
 
 **Completed:**
 

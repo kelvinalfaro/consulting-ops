@@ -1,0 +1,4 @@
+interface:
+  display_name: "Consulting Concierge"
+  short_description: "Conversational command center for Consulting Ops"
+  default_prompt: "Use $consulting-concierge to help me with my consulting opportunity pipeline."

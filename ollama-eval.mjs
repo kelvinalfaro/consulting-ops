@@ -9,10 +9,11 @@ import { fileURLToPath } from 'node:url';
 try { const { config } = await import('dotenv'); config({ quiet: true }); } catch { /* optional */ }
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
+const WORKSPACE = resolve(process.env.CONSULTING_OPS_WORKSPACE ?? '.');
 const PATHS = {
   shared: join(ROOT, 'modes', '_shared_rfp.md'), mode: join(ROOT, 'modes', 'rfp.md'),
-  capability: join(ROOT, 'capability_statement.md'), profileYml: join(ROOT, 'config', 'company_profile.yml'),
-  profileMode: join(ROOT, 'modes', '_company_profile.md'), custom: join(ROOT, 'modes', '_custom.md'), reports: join(ROOT, 'reports'),
+  capability: join(WORKSPACE, 'capability_statement.md'), profileYml: join(WORKSPACE, 'config', 'company_profile.yml'),
+  profileMode: join(WORKSPACE, 'modes', '_company_profile.md'), custom: join(WORKSPACE, 'modes', '_custom.md'), reports: join(WORKSPACE, 'reports'),
 };
 const readContext = (path, label) => {
   if (!existsSync(path)) throw new Error(`Required local context is missing: ${label} (${path})`);

@@ -30,6 +30,8 @@ Do not use AI memory, sibling folders, unrelated repositories, or general infere
 
 ## User and system layers
 
+The installed package and Git checkout are system code. Resolve private data through `--workspace`, `CONSULTING_OPS_WORKSPACE`, or the saved workspace configuration; do not require a synchronized disposable runtime. Run `consulting-ops setup` to establish this boundary.
+
 User-owned files must never be overwritten by updates:
 
 - `capability_statement.md`

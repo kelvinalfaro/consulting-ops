@@ -2,6 +2,8 @@
 
 ## Ownership boundary
 
+The normal deployment uses two physical locations: an updateable system package and a user-chosen private workspace. The default workspace is recorded in `~/.consulting-ops/config.json`; `.consulting-ops-workspace.json` identifies an initialized workspace. Neither file contains firm evidence.
+
 The user layer is never replaced by system updates: `capability_statement.md`, `config/company_profile.yml`, `config/rfp_sources.yml`, `config/plugins.yml`, `modes/_company_profile.md`, `modes/_custom.md`, `case-studies/`, `team/`, `writing-samples/`, `data/`, `reports/`, and `proposals/`. This includes `data/agent-inbox.md`, pipeline source leads, tracker history, debriefs, captured solicitation records, generated assessments, and proposal workspaces.
 
 The system layer contains executable scripts, `lib/`, bundled `providers/`, plugin templates, neutral examples/templates, shared mode instructions, dashboard code, adapters, tests, and product documentation. Private providers belong in `plugins.local/` and remain user-owned.
