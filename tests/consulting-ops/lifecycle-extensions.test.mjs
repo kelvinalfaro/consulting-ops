@@ -8,7 +8,7 @@ import { compareOpportunities } from '../../compare-rfps.mjs';
 import { createResearchBrief } from '../../client-research.mjs';
 import { followupCandidates } from '../../followup.mjs';
 import { analyzeOutcomes } from '../../analyze-outcomes.mjs';
-import { compareVersions } from '../../update-system.mjs';
+import { compareVersions, GITHUB_INSTALL_COMMAND } from '../../update-system.mjs';
 import { recordDebrief } from '../../debrief.mjs';
 import { renderTracker } from '../../lib/rfp-tracker.mjs';
 
@@ -61,4 +61,8 @@ test('update version comparison handles upgrades, equality, and local-ahead vers
   assert.equal(compareVersions('1.2.0', '1.1.9'), 1);
   assert.equal(compareVersions('v1.2.0', '1.2.0'), 0);
   assert.equal(compareVersions('1.1.9', '1.2.0'), -1);
+});
+
+test('non-Git installs point updates back to the public GitHub repository', () => {
+  assert.equal(GITHUB_INSTALL_COMMAND, 'npm install --global github:kelvinalfaro/consulting-ops');
 });

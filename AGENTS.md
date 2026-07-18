@@ -78,7 +78,7 @@ Terminal alternatives are `No Bid`, `Withdrawn`, `Cancelled`, `Expired`, and `Du
 
 ## Privacy and publication
 
-This working copy contains Alfaro Consulting material. Before initializing or publishing a public repository:
+This working copy may connect to private consulting material through an external workspace. Before publishing a public release:
 
 - replace private user files with templates or examples;
 - scan tracked content for personal data, client-confidential details, credentials, secrets, and proprietary source documents;

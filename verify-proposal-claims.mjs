@@ -34,7 +34,15 @@ export function verifyProposalClaims(draftText, approvedTexts = []) {
 export function verifyWorkspace(workspace, options = {}) {
   const draftPath = resolve(workspace, 'proposal-draft.md');
   if (!existsSync(draftPath)) throw new Error(`Proposal draft not found: ${draftPath}`);
-  const roots = options.evidenceRoots ?? ['capability_statement.md', 'config/company_profile.yml', 'case-studies', 'team', 'writing-samples'];
+  const roots = options.evidenceRoots ?? [
+    'capability_statement.md',
+    'config/company_profile.yml',
+    'case-studies',
+    'team',
+    'writing-samples',
+    resolve(workspace, 'source'),
+    resolve(workspace, 'evidence-map.md'),
+  ];
   const files = roots.flatMap((path) => {
     const absolute = resolve(path);
     if (!existsSync(absolute)) return [];

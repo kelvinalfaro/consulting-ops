@@ -5,6 +5,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import yaml from 'js-yaml';
 
 function clean(value) { return String(value ?? '').replace(/[\r\n]+/g, ' ').trim(); }
 function slug(value) { return clean(value).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'assessment'; }
@@ -16,6 +17,17 @@ const labels = {
   jurisdiction: { title: 'Jurisdiction and market-entry assessment', subject: 'Jurisdiction / procurement market' },
 };
 
+function configuredFirmName(options = {}) {
+  if (clean(options.firmName)) return clean(options.firmName);
+  const profilePath = resolve(options.profilePath ?? 'config/company_profile.yml');
+  if (!existsSync(profilePath)) return 'the consulting firm';
+  try {
+    return clean(yaml.load(readFileSync(profilePath, 'utf8'))?.firm?.name) || 'the consulting firm';
+  } catch {
+    return 'the consulting firm';
+  }
+}
+
 export function createGrowthAssessment(mode, subject, options = {}) {
   if (!labels[mode]) throw new Error(`Unsupported assessment mode: ${mode}`);
   const name = clean(subject);
@@ -25,9 +37,10 @@ export function createGrowthAssessment(mode, subject, options = {}) {
     'writing-samples/', 'modes/_company_profile.md', 'modes/_custom.md',
   ];
   const path = resolve(options.output ?? `reports/${mode}-${slug(name)}.md`);
+  const firmName = configuredFirmName(options);
   mkdirSync(dirname(path), { recursive: true });
   if (existsSync(path) && !options.force) throw new Error(`Assessment already exists: ${path}`);
-  const text = `# ${labels[mode].title}: ${name}\n\n## Decision to make\n\nShould Alfaro Consulting invest time, money, positioning, or pipeline attention in **${name}**?\n\n## Evidence boundary\n\nUse only approved firm sources and current user-supplied facts. Relevant source locations:\n${sources.map((source) => `- ${source}${existsSync(source.replace(/\/$/, '')) ? '' : ' — not currently present'}`).join('\n')}\n\n## Assessment\n\n| Dimension | Evidence | Rating | Confidence | Gap / validation needed |\n|---|---|---|---|---|\n| Strategic fit | | Unknown | Low | |\n| Client demand signal | | Unknown | Low | |\n| Capability and credibility | | Unknown | Low | |\n| Differentiation | | Unknown | Low | |\n| Effort, cost, and capacity | | Unknown | Low | |\n| Near-term pipeline value | | Unknown | Low | |\n| Long-term option value | | Unknown | Low | |\n\n## Recommendation\n\n**Decision:** Needs evidence\n\n**Why:** [Complete after evidence review.]\n\n## Next validation step\n\n- [ ] Identify the smallest bounded test that would change the decision.\n- [ ] Define a stop condition before investing further.\n- [ ] Update firm positioning or search configuration only after human confirmation.\n`;
+  const text = `# ${labels[mode].title}: ${name}\n\n## Decision to make\n\nShould ${firmName} invest time, money, positioning, or pipeline attention in **${name}**?\n\n## Evidence boundary\n\nUse only approved firm sources and current user-supplied facts. Relevant source locations:\n${sources.map((source) => `- ${source}${existsSync(source.replace(/\/$/, '')) ? '' : ' — not currently present'}`).join('\n')}\n\n## Assessment\n\n| Dimension | Evidence | Rating | Confidence | Gap / validation needed |\n|---|---|---|---|---|\n| Strategic fit | | Unknown | Low | |\n| Client demand signal | | Unknown | Low | |\n| Capability and credibility | | Unknown | Low | |\n| Differentiation | | Unknown | Low | |\n| Effort, cost, and capacity | | Unknown | Low | |\n| Near-term pipeline value | | Unknown | Low | |\n| Long-term option value | | Unknown | Low | |\n\n## Recommendation\n\n**Decision:** Needs evidence\n\n**Why:** [Complete after evidence review.]\n\n## Next validation step\n\n- [ ] Identify the smallest bounded test that would change the decision.\n- [ ] Define a stop condition before investing further.\n- [ ] Update firm positioning or search configuration only after human confirmation.\n`;
   writeFileSync(path, text, 'utf8');
   return { mode, subject: name, path, decision: 'Needs evidence' };
 }

@@ -13,5 +13,13 @@ for (const mode of ['training', 'service', 'adjacent', 'jurisdiction']) {
     const text = readFileSync(output, 'utf8');
     assert.match(text, /Evidence boundary/);
     assert.match(text, /smallest bounded test/);
+    assert.match(text, /Should the consulting firm invest/);
+    assert.doesNotMatch(text, /Alfaro Consulting/);
   });
 }
+
+test('uses an explicitly configured firm name', () => {
+  const output = join(mkdtempSync(join(tmpdir(), 'consulting-firm-name-')), 'service.md');
+  createGrowthAssessment('service', 'Strategy facilitation', { output, firmName: 'Example Consulting LLC' });
+  assert.match(readFileSync(output, 'utf8'), /Should Example Consulting LLC invest/);
+});

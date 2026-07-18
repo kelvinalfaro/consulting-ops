@@ -15,7 +15,7 @@ const requiredFiles = [
   'dashboard-server.mjs', 'update-system.mjs', 'release-audit.mjs', 'ARCHITECTURE.md',
   'DATA_CONTRACT.md', 'PARITY.md', 'README.md', 'AGENTS.md', 'templates/states.yml', 'providers/_registry.mjs',
   'FLOW_PARITY.json',
-  'docs/CAREER_OPS_1_19_PORT.md', 'docs/CAREER_OPS_1_20_PORT.md',
+  'docs/CAREER_OPS_1_19_PORT.md', 'docs/CAREER_OPS_1_20_PORT.md', 'docs/CAREER_OPS_1_21_PORT.md',
   'lib/command-center.mjs',
   'lib/workspace.mjs', 'setup.mjs', 'install-skill.mjs',
   'operational-tools.mjs', 'plugin-manager.mjs', 'agent-inbox.mjs', 'growth-assessment.mjs', 'submission-field-pack.mjs', 'evidence-intake.mjs', 'migrate-career-ops.mjs',

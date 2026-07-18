@@ -1,6 +1,6 @@
 {
   "name": "consulting-ops",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "AI-agnostic RFP discovery, bid/no-bid, proposal, and consulting opportunity pipeline",
   "private": false,
   "type": "module",
@@ -168,6 +168,7 @@
     "CHANGELOG.md",
     "docs/CAREER_OPS_1_19_PORT.md",
     "docs/CAREER_OPS_1_20_PORT.md",
+    "docs/CAREER_OPS_1_21_PORT.md",
     "CODE_OF_CONDUCT.md",
     "GOVERNANCE.md",
     "MAINTAINERS.md",

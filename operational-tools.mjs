@@ -21,10 +21,14 @@ export function verifyTracker(rows) {
   const ids = new Set();
   for (const [index, row] of rows.entries()) {
     const label = row['#'] || index + 1;
-    if (!row.issuer) failures.push(`${label}: missing issuer`);
-    if (!row.opportunity) failures.push(`${label}: missing opportunity`);
+    let normalizedStatus = null;
     if (!row.status) failures.push(`${label}: missing status`);
-    else { try { normalizeState(row.status); } catch (error) { failures.push(`${label}: ${error.message}`); } }
+    else {
+      try { normalizedStatus = normalizeState(row.status); }
+      catch (error) { failures.push(`${label}: ${error.message}`); }
+    }
+    if (!row.issuer && normalizedStatus !== 'Duplicate') failures.push(`${label}: missing issuer`);
+    if (!row.opportunity) failures.push(`${label}: missing opportunity`);
     if (ids.has(String(row['#']))) failures.push(`${label}: duplicate tracker number`);
     ids.add(String(row['#']));
   }
@@ -106,6 +110,24 @@ export function scanRunSummary(tsv = '') {
   return { runs: records.length, partial_runs: records.filter((row) => row.status === 'partial').length, last_run: records.at(-1), total_actionable: sum('actionable'), total_source_leads: sum('source_leads'), average_rejection_rate: completed.length && sum('scanned') ? Math.round(sum('rejected') / sum('scanned') * 1000) / 10 : null };
 }
 
+export function sourceHealthSummary(tsv = '', threshold = 3) {
+  const lines = tsv.trim().split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) return null;
+  const headers = lines[0].split('\t');
+  const latest = new Map();
+  for (const line of lines.slice(1)) {
+    const cells = line.split('\t');
+    const record = Object.fromEntries(headers.map((header, index) => [header, cells[index] ?? '']));
+    if (record.source && record.status) latest.set(record.source, record);
+  }
+  const sources = [...latest.values()].map((record) => ({ ...record, failure_streak: Number(record.failure_streak) || 0 }));
+  return {
+    sources: sources.length,
+    statuses: Object.fromEntries([...new Set(sources.map((record) => record.status))].map((status) => [status, sources.filter((record) => record.status === status).length])),
+    persistent_failures: sources.filter((record) => record.failure_streak >= threshold).map((record) => ({ source: record.source, status: record.status, failure_streak: record.failure_streak, detail: record.detail })),
+  };
+}
+
 export function qualityCheck(workspace) {
   const required = ['README.md', 'compliance-matrix.md', 'clarification-questions.md', 'evidence-map.md', 'proposal-draft.md', 'review-checklist.md'];
   const missing = required.filter((file) => !existsSync(join(workspace, file)));
@@ -128,7 +150,8 @@ async function run(command, args) {
   if (command === 'dedup') { const result = deduplicateTracker(rows); if (!args.includes('--dry-run')) writeTracker(result.rows, trackerPath); return { ...result, rows: result.rows.length, dry_run: args.includes('--dry-run') }; }
   if (command === 'stats') {
     const runsPath = resolve('data/scan-runs.tsv');
-    return { metrics: trackerMetrics(rows), funnel: pursuitFunnel(rows), statuses: Object.fromEntries([...new Set(rows.map((r) => r.status))].map((status) => [status, rows.filter((r) => r.status === status).length])), scan_runs: scanRunSummary(existsSync(runsPath) ? readFileSync(runsPath, 'utf8') : '') };
+    const healthPath = resolve('data/source-health.tsv');
+    return { metrics: trackerMetrics(rows), funnel: pursuitFunnel(rows), statuses: Object.fromEntries([...new Set(rows.map((r) => r.status))].map((status) => [status, rows.filter((r) => r.status === status).length])), scan_runs: scanRunSummary(existsSync(runsPath) ? readFileSync(runsPath, 'utf8') : ''), source_health: sourceHealthSummary(existsSync(healthPath) ? readFileSync(healthPath, 'utf8') : '') };
   }
   if (command === 'find') return { query: args.join(' '), rows: findTracker(rows, args.join(' ')) };
   if (command === 'add') return upsertOpportunity(structured(resolve(args[0])), {}, trackerPath);

@@ -1,49 +1,42 @@
 id: RFP-0001
-title: "Strategic planning facilitation"
-issuer: "Example Public Agency"
-source_url: "https://example.org/procurement/RFP-0001"
+title: Strategic planning facilitation
+issuer: Example Public Agency
+source_url: https://example.org/procurement/RFP-0001
 source_type: procurement_portal
-jurisdiction: "Wisconsin, United States"
-posted_date: "2026-07-01"
-questions_due: "2026-07-20T17:00:00-05:00"
+jurisdiction: Wisconsin, United States
+posted_date: '2026-07-01'
+questions_due: '2026-07-20T17:00:00-05:00'
 intent_to_bid_due: null
-proposal_due: "2026-08-03T17:00:00-05:00"
-anticipated_start: "2026-09-15"
-scope_summary: "Facilitate an inclusive strategic planning process and deliver a three-year plan."
-
+proposal_due: '2026-08-03T17:00:00-05:00'
+anticipated_start: '2026-09-15'
+scope_summary: Facilitate an inclusive strategic planning process and deliver a three-year plan.
 budget:
   stated: true
   amount: 50000
   currency: USD
-
 submission:
   method: portal_upload
-  portal: "https://example.org/procurement"
-  contact: "procurement@example.org"
-
+  portal: https://example.org/procurement
+  contact: procurement@example.org
 mandatory_requirements:
-  - name: "Three relevant client references"
-    source: "RFP section 5.2"
+  - name: Three relevant client references
+    source: RFP section 5.2
     status: unknown
-
 required_attachments:
-  - name: "Cost proposal form"
+  - name: Cost proposal form
     status: open
-
 evaluation_criteria:
-  - name: "Relevant experience"
-    weight: "30%"
-  - name: "Approach and work plan"
-    weight: "35%"
-  - name: "Cost"
-    weight: "20%"
-  - name: "Interview"
-    weight: "15%"
-
+  - name: Relevant experience
+    weight: 30%
+  - name: Approach and work plan
+    weight: 35%
+  - name: Cost
+    weight: 20%
+  - name: Interview
+    weight: 15%
 capacity_status: unknown
 terms_status: unknown
 scope_status: within
-
 assessment:
   scores:
     capability_fit: null
@@ -53,3 +46,8 @@ assessment:
     commercial_attractiveness: null
     procurement_win_conditions: null
     strategic_value: null
+  score: null
+  coverage: 0
+  recommendation: Needs Clarification
+  decision: Needs Clarification
+  evaluated_at: '2026-07-15T14:19:25.207Z'

@@ -4,7 +4,7 @@
 
 import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import yaml from 'js-yaml';
 import { loadProviderPlugins, resolveProvider } from './providers/_registry.mjs';
 import { matchesTerm } from './providers/_match.mjs';
@@ -12,12 +12,53 @@ import { matchesTerm } from './providers/_match.mjs';
 const DEFAULT_CONFIG = 'config/rfp_sources.yml';
 const DEFAULT_PIPELINE = 'data/rfp_pipeline.md';
 const DEFAULT_RUNS = 'data/scan-runs.tsv';
+const SYSTEM_ROOT = dirname(fileURLToPath(import.meta.url));
 export const SCAN_RUNS_HEADER = 'timestamp\tstatus\tscanned\tactionable\tsource_leads\trejected\tduplicates\terrors\n';
+export const SOURCE_HEALTH_HEADER = 'timestamp\tsource\tstatus\tfailure_streak\tdetail\n';
+
+export function defaultProviderRoots(workspace = process.cwd()) {
+  return [join(SYSTEM_ROOT, 'providers'), resolve(workspace, 'plugins.local')];
+}
 
 export function appendScanRun(stats, path = resolve(DEFAULT_RUNS), now = new Date()) {
   if (!existsSync(path)) writeFileSync(path, SCAN_RUNS_HEADER, 'utf8');
   const row = [now.toISOString(), stats.errors ? 'partial' : 'completed', stats.scanned, stats.actionable, stats.source_leads, stats.rejected, stats.duplicates, stats.errors].join('\t');
   appendFileSync(path, `${row}\n`, 'utf8');
+  return path;
+}
+
+function cleanTsv(value = '') {
+  return String(value ?? '').replace(/[\t\r\n]+/g, ' ').trim();
+}
+
+export function loadSourceHealth(path) {
+  if (!existsSync(path)) return [];
+  return readFileSync(path, 'utf8').split(/\r?\n/).slice(1).filter(Boolean).map((line) => {
+    const [timestamp, source, status, failureStreak, detail = ''] = line.split('\t');
+    return { timestamp, source, status, failure_streak: Number(failureStreak) || 0, detail };
+  });
+}
+
+export function sourceFailureStreaks(records = []) {
+  const streaks = new Map();
+  for (const record of records) {
+    const failure = ['network', 'configuration', 'authorization_required'].includes(record.status);
+    streaks.set(record.source, failure ? (streaks.get(record.source) ?? 0) + 1 : 0);
+  }
+  return streaks;
+}
+
+export function appendSourceHealth(records, path, now = new Date()) {
+  if (!records.length) return path;
+  if (!existsSync(path)) writeFileSync(path, SOURCE_HEALTH_HEADER, 'utf8');
+  const previous = sourceFailureStreaks(loadSourceHealth(path));
+  const rows = records.map((record) => {
+    const failure = ['network', 'configuration', 'authorization_required'].includes(record.status);
+    const failureStreak = failure ? (previous.get(record.source) ?? 0) + 1 : 0;
+    previous.set(record.source, failureStreak);
+    return [now.toISOString(), record.source, record.status, failureStreak, record.detail ?? ''].map(cleanTsv).join('\t');
+  });
+  appendFileSync(path, `${rows.join('\n')}\n`, 'utf8');
   return path;
 }
 
@@ -81,13 +122,14 @@ export function parseJsonFeed(payload, source = {}) {
   })).filter((item) => item.title && /^https?:\/\//i.test(item.url));
 }
 
-export function classifyItem(item, filters = {}) {
+export function classifyItemDetailed(item, filters = {}, now = new Date()) {
   const haystack = `${item.title} ${item.issuer} ${item.summary ?? ''}`.toLowerCase();
   const include = Array.isArray(filters.include_terms) ? filters.include_terms : [];
   const exclude = Array.isArray(filters.exclude_terms) ? filters.exclude_terms : [];
   const opportunityTerms = filters.opportunity_terms ?? [
     'rfp', 'rfq', 'request for proposal', 'request for qualification', 'solicitation',
-    'invitation to bid', 'call for consultant', 'consulting opportunity',
+    'invitation to bid', 'call for consultant', 'consulting opportunity', 'sourcing event',
+    'obtaining bids', 'bids must be submitted', 'completed bids must',
     'current business opportunities', 'contract opportunities', 'current advertisements',
   ];
   const informationalPatterns = filters.informational_patterns ?? [
@@ -115,16 +157,32 @@ export function classifyItem(item, filters = {}) {
   const excludedDomain = excludedDomains.some((domain) => item.url?.toLowerCase().includes(String(domain).toLowerCase()));
   const blacklistedIssuer = blacklistedIssuers.some((issuer) => matchesTerm(String(item.issuer ?? '').toLowerCase(), issuer));
   const deadline = item.deadline ? new Date(item.deadline) : null;
-  const expired = deadline && !Number.isNaN(deadline.valueOf()) && deadline < new Date(new Date().toISOString().slice(0, 10));
+  const expired = deadline && !Number.isNaN(deadline.valueOf()) && deadline < new Date(now.toISOString().slice(0, 10));
   const published = item.published ? new Date(item.published) : null;
   const maxAge = Number(filters.max_posting_age_days);
   const stale = Number.isFinite(maxAge) && maxAge > 0 && published && !Number.isNaN(published.valueOf())
-    && published < new Date(Date.now() - maxAge * 86400000);
-  if (excluded || informational || excludedDomain || blacklistedIssuer || expired || stale) return 'reject';
-  if (procurementPortal) return 'source_lead';
-  if (!opportunityLike) return 'reject';
-  if (!targetDomain && included) return 'source_lead';
-  return targetDomain ? 'opportunity' : 'reject';
+    && published < new Date(now.valueOf() - maxAge * 86400000);
+  const rejectionReasons = [
+    excluded && 'excluded_term',
+    informational && 'informational_content',
+    excludedDomain && 'excluded_domain',
+    blacklistedIssuer && 'blacklisted_issuer',
+    expired && 'expired_deadline',
+    stale && 'stale_posting',
+  ].filter(Boolean);
+  if (rejectionReasons.length) return { classification: 'reject', confidence: 100, reason_codes: rejectionReasons };
+  if (procurementPortal) return { classification: 'source_lead', confidence: 85, reason_codes: ['generic_procurement_source'] };
+  if (!opportunityLike) return { classification: 'reject', confidence: 90, reason_codes: ['missing_solicitation_signal'] };
+  if (!targetDomain) {
+    return included
+      ? { classification: 'source_lead', confidence: 60, reason_codes: ['service_fit_unconfirmed'] }
+      : { classification: 'reject', confidence: 90, reason_codes: ['missing_service_fit'] };
+  }
+  return { classification: 'opportunity', confidence: 95, reason_codes: ['solicitation_signal', 'service_fit'] };
+}
+
+export function classifyItem(item, filters = {}, now = new Date()) {
+  return classifyItemDetailed(item, filters, now).classification;
 }
 
 export function parseIssuerBlacklist(markdown = '') {
@@ -137,12 +195,58 @@ export function keywordMatch(item, filters = {}) {
   return classifyItem(item, filters) !== 'reject';
 }
 
+const TRACKING_PARAMS = new Set(['fbclid', 'gclid', 'mc_cid', 'mc_eid', 'ref', 'source']);
+
+export function canonicalizeUrl(value) {
+  try {
+    const url = new URL(value);
+    url.hash = '';
+    for (const key of [...url.searchParams.keys()]) {
+      if (key.toLowerCase().startsWith('utm_') || TRACKING_PARAMS.has(key.toLowerCase())) url.searchParams.delete(key);
+    }
+    url.searchParams.sort();
+    if (url.pathname.length > 1) url.pathname = url.pathname.replace(/\/+$/, '');
+    return url.href;
+  } catch {
+    return String(value ?? '').trim();
+  }
+}
+
+function fingerprintPart(value = '') {
+  return repairText(value).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+export function opportunityFingerprint(item = {}) {
+  const issuer = fingerprintPart(item.issuer);
+  const title = fingerprintPart(item.title);
+  if (!issuer || !title) return null;
+  const deadline = fingerprintPart(item.deadline ?? '');
+  return `${issuer}|${title}|${deadline}`;
+}
+
 export function existingUrls(markdown) {
-  return new Set(markdown.match(/https?:\/\/[^\s)>]+/g) ?? []);
+  return new Set((markdown.match(/https?:\/\/[^\s)>]+/g) ?? []).map(canonicalizeUrl));
+}
+
+export function existingFingerprints(markdown) {
+  const fingerprints = new Set();
+  for (const line of markdown.split(/\r?\n/)) {
+    const match = line.match(/^\s*- \[[ xX]\]\s+(https?:\/\/\S+)\s+\|\s+([^|]+)\s+\|\s+([^|]+)/);
+    if (!match) continue;
+    const due = line.match(/\|\s+due\s+([^|]+)/i)?.[1]?.trim() ?? null;
+    const fingerprint = opportunityFingerprint({ issuer: match[2].trim(), title: match[3].trim(), deadline: due });
+    if (fingerprint) fingerprints.add(fingerprint);
+  }
+  return fingerprints;
 }
 
 function pipelineLines(items) {
-  return items.map((item) => `- [ ] ${item.url} | ${repairText(item.issuer || 'Unknown issuer')} | ${repairText(item.title)}${item.deadline ? ` | due ${repairText(item.deadline)}` : item.published ? ` | published ${repairText(item.published)}` : ''}`).join('\n');
+  return items.map((item) => {
+    const date = item.deadline ? ` | due ${repairText(item.deadline)}` : item.published ? ` | published ${repairText(item.published)}` : '';
+    const confidence = Number.isFinite(item.confidence) ? ` | confidence: ${item.confidence}` : '';
+    const reasons = item.reason_codes?.length ? ` | reasons: ${item.reason_codes.join(',')}` : '';
+    return `- [ ] ${item.url} | ${repairText(item.issuer || 'Unknown issuer')} | ${repairText(item.title)}${date}${confidence}${reasons}`;
+  }).join('\n');
 }
 
 export function insertPending(markdown, items) {
@@ -172,6 +276,24 @@ export function insertSourceLeads(markdown, items) {
   const nextHeadingRelative = markdown.slice(afterHeading).search(/\n##\s+/);
   const sectionEnd = nextHeadingRelative < 0 ? markdown.length : afterHeading + nextHeadingRelative;
   return `${markdown.slice(0, sectionEnd).trimEnd()}\n\n${lines}\n${markdown.slice(sectionEnd)}`;
+}
+
+export function mergeSourceFilters(globalFilters = {}, sourceFilters = {}) {
+  return {
+    ...globalFilters,
+    ...sourceFilters,
+    blacklist_issuers: [
+      ...(globalFilters.blacklist_issuers ?? []),
+      ...(sourceFilters.blacklist_issuers ?? []),
+    ],
+  };
+}
+
+function sourceErrorStatus(error) {
+  const message = String(error?.message ?? error).toLowerCase();
+  if (/\b(?:401|403)\b|unauthori[sz]ed|forbidden/.test(message)) return 'authorization_required';
+  if (/unsupported source type|requires (?:url|endpoint)|duplicate discovery provider|invalid config/.test(message)) return 'configuration';
+  return 'network';
 }
 
 async function fetchSource(source, config = {}, providers = new Map()) {
@@ -206,41 +328,72 @@ export async function scan(config, options = {}) {
   const pipelinePath = resolve(options.pipelinePath ?? DEFAULT_PIPELINE);
   const current = existsSync(pipelinePath) ? readFileSync(pipelinePath, 'utf8') : '# RFP pipeline\n\n## Pending\n\n## Processed\n';
   const seen = existingUrls(current);
-  const providers = options.providers ?? await loadProviderPlugins(options.providerRoots ?? ['providers', 'plugins.local']);
+  const seenFingerprints = existingFingerprints(current);
+  const providers = options.providers ?? await loadProviderPlugins(options.providerRoots ?? defaultProviderRoots(dirname(dirname(pipelinePath))));
   const blacklistPath = resolve(options.blacklistPath ?? 'data/blacklist.md');
   const blacklistIssuers = options.blacklistIssuers ?? (existsSync(blacklistPath) ? parseIssuerBlacklist(readFileSync(blacklistPath, 'utf8')) : []);
-  const filters = { ...(config.filters ?? {}), blacklist_issuers: [...(config.filters?.blacklist_issuers ?? []), ...blacklistIssuers] };
+  const globalFilters = { ...(config.filters ?? {}), blacklist_issuers: [...(config.filters?.blacklist_issuers ?? []), ...blacklistIssuers] };
   const found = [];
   const sourceLeads = [];
+  const rejectedItems = [];
   const errors = [];
+  const sourceHealth = [];
+  const rejectionReasons = {};
   let scanned = 0;
-  let rejected = 0;
   let duplicates = 0;
   for (const source of config.sources ?? []) {
     if (source.enabled === false) continue;
     try {
       const items = await fetchSource(source, config, providers);
+      sourceHealth.push({ source: source.id, status: items.length ? 'reachable' : 'empty', detail: `${items.length} items` });
+      const filters = mergeSourceFilters(globalFilters, source.filters ?? {});
       for (const item of items) {
         scanned += 1;
-        const classification = classifyItem(item, filters);
-        if (classification === 'reject') { rejected += 1; continue; }
-        if (seen.has(item.url)) { duplicates += 1; continue; }
-        if (!seen.has(item.url)) {
-          seen.add(item.url);
-          if (classification === 'opportunity') found.push(item);
-          else sourceLeads.push(item);
+        const classification = classifyItemDetailed(item, filters, options.now ?? new Date());
+        const result = { ...item, ...classification, canonical_url: canonicalizeUrl(item.url) };
+        if (classification.classification === 'reject') {
+          rejectedItems.push(result);
+          for (const reason of classification.reason_codes) rejectionReasons[reason] = (rejectionReasons[reason] ?? 0) + 1;
+          continue;
         }
+        const fingerprint = opportunityFingerprint(result);
+        if (seen.has(result.canonical_url) || (fingerprint && seenFingerprints.has(fingerprint))) { duplicates += 1; continue; }
+        seen.add(result.canonical_url);
+        if (fingerprint) seenFingerprints.add(fingerprint);
+        if (classification.classification === 'opportunity') found.push(result);
+        else sourceLeads.push(result);
       }
     } catch (error) {
-      errors.push({ source: source.id, error: error.message });
+      const status = sourceErrorStatus(error);
+      errors.push({ source: source.id, status, error: error.message });
+      sourceHealth.push({ source: source.id, status, detail: error.message });
     }
   }
   if ((found.length || sourceLeads.length) && !options.dryRun) {
     writeFileSync(pipelinePath, insertSourceLeads(insertPending(current, found), sourceLeads), 'utf8');
   }
-  const stats = { scanned, actionable: found.length, source_leads: sourceLeads.length, rejected, duplicates, errors: errors.length };
-  if (!options.dryRun) appendScanRun(stats, resolve(options.runsPath ?? join(dirname(pipelinePath), 'scan-runs.tsv')), options.now ?? new Date());
-  return { found, sourceLeads, errors, stats, dryRun: Boolean(options.dryRun) };
+  const stats = {
+    scanned,
+    actionable: found.length,
+    source_leads: sourceLeads.length,
+    rejected: rejectedItems.length,
+    duplicates,
+    errors: errors.length,
+    rejection_reasons: rejectionReasons,
+  };
+  if (!options.dryRun) {
+    const now = options.now ?? new Date();
+    appendScanRun(stats, resolve(options.runsPath ?? join(dirname(pipelinePath), 'scan-runs.tsv')), now);
+    appendSourceHealth(sourceHealth, resolve(options.healthPath ?? join(dirname(pipelinePath), 'source-health.tsv')), now);
+  }
+  const priorHealth = options.dryRun ? [] : loadSourceHealth(resolve(options.healthPath ?? join(dirname(pipelinePath), 'source-health.tsv')));
+  const streaks = sourceFailureStreaks(priorHealth);
+  const health = sourceHealth.map((record) => ({
+    ...record,
+    failure_streak: streaks.get(record.source) ?? 0,
+    persistent_failure: (streaks.get(record.source) ?? 0) >= Number(config.source_health_threshold ?? 3),
+  }));
+  return { found, sourceLeads, rejectedItems, errors, sourceHealth: health, stats, dryRun: Boolean(options.dryRun) };
 }
 
 async function main() {
@@ -253,7 +406,9 @@ async function main() {
   }
   const config = yaml.load(readFileSync(configPath, 'utf8')) ?? {};
   const result = await scan(config, { dryRun: args.includes('--dry-run') });
-  console.log(JSON.stringify({ new_opportunities: result.found.length, ...result }, null, 2));
+  const output = { new_opportunities: result.found.length, ...result };
+  if (!args.includes('--include-rejected')) delete output.rejectedItems;
+  console.log(JSON.stringify(output, null, 2));
   if (result.errors.length) process.exitCode = 2;
 }
 

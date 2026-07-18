@@ -12,4 +12,34 @@
 - Prepare submission fields without submitting: `consulting-ops apply <proposal-workspace>`
 - Inspect setup: `consulting-ops doctor --json`
 
+## Routes beyond the pursuit engine
+
+- These routes must not block when optional skills are absent. Use the named skill when installed; otherwise use the matching section in `standalone-workflows.md`.
+- Initial inquiry and discovery: optional `consulting-engagement-design`; fallback `Shape an inquiry`.
+- Solicitation response: `consulting-ops proposal <record>`. Standalone proposal or SOW: optional `consulting-proposal-sow`; fallback `Shape a standalone proposal or SOW`.
+- Accepted agreement and pre-launch readiness: follow `engagement-intake.md`.
+- Active engagement, reset, handoff, or closeout: optional `consulting-engagement-stewardship`; fallback `Steward an active engagement`.
+- One general-purpose CSV: optional `csv-data-summarizer`; fallback `Bound non-core analysis`.
+- Multiple financial statements, budgets, management reports, or readable financial PDFs: optional `analyze-financial-performance`; fallback `Bound non-core analysis`.
+- ROI, NPV, investment justification, option economics, or sensitivity analysis: optional `consulting-business-case`; fallback `Bound non-core analysis`.
+- Client requests, sponsor updates, or other direct outward-facing drafts: optional `direct-communication-memo`; fallback `Draft a bounded client communication`.
+
 Read the command's generated source references and unresolved-item lists before interpreting results. Use `consulting-ops more` only when no concise route fits.
+
+## Opportunity lifecycle and next-step suggestions
+
+Use the current status and artifacts to suggest only the next useful actions:
+
+1. **Find:** Scan for opportunities or process saved leads.
+2. **Capture:** Preserve the authoritative solicitation and normalize its requirements.
+3. **Evaluate:** Check hard gates, evidence fit, commercial conditions, and bid recommendation.
+4. **Decide:** Ask the user for `Bid`, `Conditional Bid`, `No Bid`, or clarification.
+5. **Pursue:** Create `proposals/<opportunity-id>/`, copy the RFP and amendments into its `source/` folder, and update the tracker.
+6. **Clarify:** Resolve budget, scope, schedule, terms, references, and other material unknowns before pricing.
+7. **Draft:** Complete the compliance matrix, evidence map, response outline, work plan, team, past performance, pricing assumptions, attachments, executive summary, and cover letter.
+8. **Review:** Verify requirements, claims, pricing, legal terms, attachments, and final files.
+9. **Prepare submission:** Build the submission field pack or final email without sending; the user submits.
+10. **Follow through:** Record submission, plan follow-up, prepare for finalist stages, and track the outcome.
+11. **Learn or launch:** On `Won`, complete contracting and route the accepted agreement to engagement intake; on `Lost`, `Withdrawn`, or `No Bid`, record the reason and debrief useful patterns.
+
+At task completion, recommend the earliest incomplete stage that materially advances the opportunity. Mention deadline-sensitive work first and distinguish actions the concierge can prepare from approvals or external actions the user must perform.

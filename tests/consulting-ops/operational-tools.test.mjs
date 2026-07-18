@@ -3,12 +3,14 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { checkLiveness, deduplicateTracker, findTracker, inboxSummary, qualityCheck, reconcilePipeline, scanRunSummary, verifyTracker } from '../../operational-tools.mjs';
+import { checkLiveness, deduplicateTracker, findTracker, inboxSummary, qualityCheck, reconcilePipeline, scanRunSummary, sourceHealthSummary, verifyTracker } from '../../operational-tools.mjs';
 
 const valid = { '#': '1', issuer: 'Agency', opportunity: 'Planning RFP', status: 'Bid', notes: 'RFP-1', due: '', next_action: '' };
 
 test('verifies, finds, and deduplicates tracker rows', () => {
   assert.deepEqual(verifyTracker([valid]), []);
+  assert.deepEqual(verifyTracker([{ ...valid, issuer: '', status: 'Duplicate' }]), []);
+  assert.deepEqual(verifyTracker([{ ...valid, issuer: '', status: 'Bid' }]), ['1: missing issuer']);
   assert.equal(findTracker([valid], 'planning').length, 1);
   const result = deduplicateTracker([valid, { ...valid, '#': '2', report: 'reports/2.md' }]);
   assert.equal(result.rows.length, 1);
@@ -49,4 +51,15 @@ test('scan run summary separates partial runs and computes completed-run quality
   assert.equal(result.partial_runs, 1);
   assert.equal(result.total_actionable, 2);
   assert.equal(result.average_rejection_rate, 60);
+});
+
+test('source health summary surfaces only latest persistent failures', () => {
+  const tsv = 'timestamp\tsource\tstatus\tfailure_streak\tdetail\n' +
+    '2026-07-12\tportal-a\tnetwork\t2\ttimeout\n' +
+    '2026-07-13\tportal-a\tnetwork\t3\ttimeout\n' +
+    '2026-07-13\tportal-b\treachable\t0\t4 items\n';
+  const result = sourceHealthSummary(tsv);
+  assert.equal(result.sources, 2);
+  assert.deepEqual(result.statuses, { network: 1, reachable: 1 });
+  assert.deepEqual(result.persistent_failures, [{ source: 'portal-a', status: 'network', failure_streak: 3, detail: 'timeout' }]);
 });
