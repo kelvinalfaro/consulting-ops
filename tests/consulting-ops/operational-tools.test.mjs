@@ -9,6 +9,8 @@ const valid = { '#': '1', issuer: 'Agency', opportunity: 'Planning RFP', status:
 
 test('verifies, finds, and deduplicates tracker rows', () => {
   assert.deepEqual(verifyTracker([valid]), []);
+  assert.deepEqual(verifyTracker([{ ...valid, issuer: '', status: 'Duplicate' }]), []);
+  assert.deepEqual(verifyTracker([{ ...valid, issuer: '', status: 'Bid' }]), ['1: missing issuer']);
   assert.equal(findTracker([valid], 'planning').length, 1);
   const result = deduplicateTracker([valid, { ...valid, '#': '2', report: 'reports/2.md' }]);
   assert.equal(result.rows.length, 1);

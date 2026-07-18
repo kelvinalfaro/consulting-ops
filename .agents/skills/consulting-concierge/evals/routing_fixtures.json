@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "routes": [
+    {"id": "osc-discovery", "prompt": "Help frame a new OSC sponsor inquiry before we define the work.", "expected": "consulting-engagement-design"},
+    {"id": "alfaro-pursuit", "prompt": "Evaluate this Alfaro Consulting RFQ and decide whether to bid.", "expected": "Consulting Ops"},
+    {"id": "signed-sow", "prompt": "The SOW is signed; establish the engagement folder, evidence inventory, access gaps, and kickoff readiness.", "expected": "engagement-intake.md"},
+    {"id": "active-reset", "prompt": "This active engagement is drifting and needs a sponsor reset.", "expected": "consulting-engagement-stewardship"},
+    {"id": "single-csv", "prompt": "Summarize this one general CSV.", "expected": "csv-data-summarizer"},
+    {"id": "multi-file-financials", "prompt": "Analyze these statements, budget files, and management reports.", "expected": "analyze-financial-performance"},
+    {"id": "investment-case", "prompt": "Build ROI, NPV, and sensitivity for the proposed investment.", "expected": "consulting-business-case"},
+    {"id": "sponsor-update", "prompt": "Draft a sponsor update explaining the supported finding and next action.", "expected": "direct-communication-memo"}
+  ]
+}

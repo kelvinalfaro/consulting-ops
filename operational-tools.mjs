@@ -21,10 +21,14 @@ export function verifyTracker(rows) {
   const ids = new Set();
   for (const [index, row] of rows.entries()) {
     const label = row['#'] || index + 1;
-    if (!row.issuer) failures.push(`${label}: missing issuer`);
-    if (!row.opportunity) failures.push(`${label}: missing opportunity`);
+    let normalizedStatus = null;
     if (!row.status) failures.push(`${label}: missing status`);
-    else { try { normalizeState(row.status); } catch (error) { failures.push(`${label}: ${error.message}`); } }
+    else {
+      try { normalizedStatus = normalizeState(row.status); }
+      catch (error) { failures.push(`${label}: ${error.message}`); }
+    }
+    if (!row.issuer && normalizedStatus !== 'Duplicate') failures.push(`${label}: missing issuer`);
+    if (!row.opportunity) failures.push(`${label}: missing opportunity`);
     if (ids.has(String(row['#']))) failures.push(`${label}: duplicate tracker number`);
     ids.add(String(row['#']));
   }

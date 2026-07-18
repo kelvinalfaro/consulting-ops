@@ -1,5 +1,15 @@
 # consulting-ops project log
 
+## 2026-07-17 - Lifecycle routing and contracted-engagement intake
+
+**Objective:** Extend the public concierge beyond pursuit operations while keeping private financial-analysis implementation outside this repository.
+
+**Completed:** Added independently written lifecycle routing for inquiry and engagement design, RFP/RFQ pursuits, proposals and SOWs, accepted-agreement intake, active-engagement stewardship, private management financial analysis when installed, and direct sponsor communication. Added a contracted-engagement intake reference that confirms the authoritative folder and charter, inventories evidence without altering sources, separates confirmed terms from assumptions and gaps, assesses kickoff readiness, and links the intake record from the engagement project log. Kept Consulting Ops system onboarding, engagement intake, and financial-analysis intake distinct.
+
+**Synchronization:** Reinstalled the repository-bundled `consulting-concierge` to Kelvin's portable and Codex discovery locations. All six bundled skill files have matching hashes across the repository, `C:\Users\Kelvin\.agents\skills`, and the shared skill junction.
+
+**Validation:** Added eight routing fixtures and two executable concierge-routing tests. The full Consulting Ops gate passed: 87/87 tests, parity audit, release/privacy audit, workspace verification, and package dry run. No release, push, or publication was performed.
+
 ## 2026-07-16 - Public external-workspace installer and concierge architecture
 
 **Objective:** Make the public product install like Kelvin's separated setup while remaining AI-agent agnostic.
@@ -7,6 +17,14 @@
 **Completed:** Added persistent workspace resolution, `consulting-ops setup`, portable/native Agent Skill installation, and the bundled `consulting-concierge` primary interface. System assets now resolve from the package while private files resolve from the configured workspace. This supersedes the disposable-runtime synchronization approach described in older entries; those runtime copies are no longer part of the intended product architecture.
 
 **Validation:** A clean temporary install created and onboarded an external workspace, installed the skill to portable, Codex, Gemini, and Claude locations, and ran doctor and tracker successfully. The full test, parity, release/privacy, tracker, and package gates passed.
+
+**Evaluation hardening:** During the Scenic Rivers Land Trust evaluation, corrected budget normalization so a missing amount remains unknown rather than being coerced to zero and incorrectly flagged below the configured firm minimum. Added regression coverage for both the amount and minimum comparison.
+
+**Pursuit hardening:** Preserved tracker numbering across parse/render cycles and allowed a closed `Duplicate` capture to retain an unknown issuer without failing workspace verification. Both behaviors have regression coverage.
+
+**Concierge refinement:** Updated the bundled `consulting-concierge` skill to copy authoritative RFPs and amendments into an active proposal workspace when a pursuit begins, recommend status-aware next steps after completed tasks, and reserve all outward-facing or commitment actions for the user.
+
+**Claim validation:** Proposal quality checks now treat preserved solicitation and clarification files in a proposal's `source/` folder, plus its evidence map, as approved evidence for client-stated metrics. Added regression coverage using a client-confirmed budget.
 
 ## 2026-07-15 - Google Antigravity launcher option
 

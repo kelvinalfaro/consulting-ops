@@ -27,7 +27,10 @@ test('parses RFP tracker and computes pursuit metrics', () => {
 
 test('tracker render round-trips canonical columns', () => {
   const rows = parseTracker(markdown);
+  assert.equal(rows[0]['#'], '1');
+  assert.equal(rows[1]['#'], '2');
   const rendered = renderTracker(rows);
+  assert.equal(parseTracker(rendered)[0]['#'], '1');
   assert.equal(parseTracker(rendered)[0].issuer, 'City');
   assert.match(rendered, /\| # \| Identified \| Issuer/);
 });
