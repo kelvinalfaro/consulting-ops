@@ -133,7 +133,9 @@ export default {
 };
 ```
 
-This keeps paid databases, local credentials, and organization-specific connectors outside the public core.
+This keeps paid databases, local credentials, and organization-specific connectors outside the public core. Bundled providers resolve from the installed package while private providers resolve from the configured workspace; duplicate provider IDs fail explicitly.
+
+Discovery records explainable classifications and confidence reasons, canonicalizes tracking URLs, fingerprints issuer/title/deadline duplicates, and tracks per-source health in the private workspace. Use `consulting-ops scan --dry-run` for a write-free preview and add `--include-rejected` only when item-level rejection diagnostics are needed.
 
 ## Use with AI coding assistants
 

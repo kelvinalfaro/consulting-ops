@@ -8,7 +8,7 @@ The user layer is never replaced by system updates: `capability_statement.md`, `
 
 The system layer contains executable scripts, `lib/`, bundled `providers/`, plugin templates, neutral examples/templates, shared mode instructions, dashboard code, adapters, tests, and product documentation. Private providers belong in `plugins.local/` and remain user-owned.
 
-`data/scan-runs.tsv` is an append-only per-run quality log containing timestamp, completion status, scanned count, actionable count, source-lead count, rejected count, duplicate count, and provider-error count. `stats` aggregates completed runs separately from partial runs.
+`data/scan-runs.tsv` is an append-only per-run quality log containing timestamp, completion status, scanned count, actionable count, source-lead count, rejected count, duplicate count, and provider-error count. `data/source-health.tsv` is an append-only per-source coverage log containing timestamp, source, reachable/empty/error status, consecutive failure count, and a bounded detail. `stats` aggregates completed runs separately from partial runs.
 
 ## Opportunity record
 
@@ -35,7 +35,7 @@ Export files remain review-marked. A workspace is not evidence of approval or su
 
 ## Discovery provider result
 
-Providers return an array of objects with `title`, an HTTP(S) `url`, `issuer`, optional `published`, `deadline`, and `summary`, and `source_id`. Scanning repairs common encoding corruption, applies word/phrase-boundary filters, rejects expired and informational results, and de-duplicates URLs across the pipeline. Concrete domain-relevant solicitations are written beneath `## Pending`; useful portal or directory discoveries are written beneath `## Source leads`. Only the `Pending` section is executable by pipeline, reconcile, and inbox flows.
+Providers return an array of objects with `title`, an HTTP(S) `url`, `issuer`, optional `published`, `deadline`, and `summary`, and `source_id`. Scanning repairs common encoding corruption, applies global plus optional source-specific filters, rejects expired and informational results, and de-duplicates canonical URLs plus issuer/title/deadline fingerprints. Classified results add `classification`, `confidence`, `reason_codes`, and `canonical_url`. Concrete domain-relevant solicitations are written beneath `## Pending`; useful portal or directory discoveries are written beneath `## Source leads`. Only the `Pending` section is executable by pipeline, reconcile, and inbox flows.
 
 ## Agent inbox
 

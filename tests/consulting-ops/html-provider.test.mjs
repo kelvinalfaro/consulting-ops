@@ -21,3 +21,10 @@ test('HTML provider extracts a response deadline from a procurement table row', 
   const rows = parseHtmlLinks(html, { id: 'city', url: 'https://city.example/bids', context_filter: true, link_include_terms: ['strategic planning'] });
   assert.equal(rows[0].deadline, 'August 20, 2026');
 });
+
+test('HTML provider keeps one authoritative document link per procurement table row', () => {
+  const html = `<table><tr><td>Strategic planning RFP</td><td><a href="/profile">Event details</a></td><td><a href="/files/42.zip">Bid Documents</a></td></tr></table>`;
+  const rows = parseHtmlLinks(html, { id: 'city', url: 'https://city.example/bids', context_filter: true, link_include_terms: ['strategic planning'] });
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].url, 'https://city.example/files/42.zip');
+});

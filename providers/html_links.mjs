@@ -7,6 +7,7 @@ function resolveUrl(href, base) {
 
 export function parseHtmlLinks(html, source) {
   const results = [];
+  const tableRows = new Map();
   const pattern = /<a\b([^>]*?)href=["']([^"']+)["']([^>]*)>([\s\S]*?)<\/a>/gi;
   for (const match of html.matchAll(pattern)) {
     const url = resolveUrl(decodeHtml(match[2]), source.url);
@@ -25,8 +26,16 @@ export function parseHtmlLinks(html, source) {
     if (exclude.some((term) => matchesTerm(haystack, term))) continue;
     const dueMatch = around.match(/(?:response|proposal|submission)?\s*due(?: date(?:\s*&\s*time)?)?\s*:?\s*((?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4})/i);
     const deadline = dueMatch ? dueMatch[1].replace(/(\d)(?:st|nd|rd|th)/i, '$1') : null;
-    results.push({ title, url, issuer: source.label ?? source.id, published: null, deadline, summary: around, source_id: source.id });
+    const item = { title, url, issuer: source.label ?? source.id, published: null, deadline, summary: around, source_id: source.id };
+    if (rowStart >= 0 && rowEnd > match.index) {
+      const key = `${rowStart}:${rowEnd}`;
+      const score = /\.(?:pdf|docx?|zip)(?:$|[?#])/i.test(url) ? 3 : /\b(?:bid|rfp|rfq)\b/i.test(title) ? 2 : 1;
+      if (!tableRows.has(key) || score > tableRows.get(key).score) tableRows.set(key, { item, score });
+    } else {
+      results.push(item);
+    }
   }
+  results.push(...[...tableRows.values()].map(({ item }) => item));
   return [...new Map(results.map((item) => [item.url, item])).values()];
 }
 

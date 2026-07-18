@@ -1,4 +1,5 @@
 version: 1
+source_health_threshold: 3
 
 search_terms:
   - '"request for proposals" "strategic planning"'
@@ -33,3 +34,6 @@ filters:
   # Issuers can also be listed one per bullet in private data/blacklist.md.
   blacklist_issuers: []
   countries: ["United States"]
+
+  # Sources may override global filters with a nested `filters:` block when a
+  # portal uses different solicitation or service vocabulary.

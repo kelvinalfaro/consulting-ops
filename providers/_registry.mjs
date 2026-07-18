@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 /** Load built-in providers and untracked local provider plugins. */
 export async function loadProviderPlugins(roots = ['providers', 'plugins.local']) {
   const providers = new Map();
+  const origins = new Map();
   for (const root of roots.map((value) => resolve(value))) {
     if (!existsSync(root)) continue;
     for (const entry of readdirSync(root, { withFileTypes: true })) {
@@ -17,7 +18,13 @@ export async function loadProviderPlugins(roots = ['providers', 'plugins.local']
       if (!file) continue;
       const module = await import(pathToFileURL(file).href);
       const provider = module.default;
-      if (provider?.id && typeof provider.fetch === 'function') providers.set(provider.id, provider);
+      if (provider?.id && typeof provider.fetch === 'function') {
+        if (providers.has(provider.id)) {
+          throw new Error(`Duplicate discovery provider id "${provider.id}" in ${origins.get(provider.id)} and ${file}`);
+        }
+        providers.set(provider.id, provider);
+        origins.set(provider.id, file);
+      }
     }
   }
   return providers;

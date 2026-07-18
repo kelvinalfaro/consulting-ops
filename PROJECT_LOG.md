@@ -1,5 +1,13 @@
 # consulting-ops project log
 
+## 2026-07-18 - Discovery quality and Career Ops 1.21 parity
+
+**Objective:** Repair external-workspace discovery and reduce false positives without adding DemandStar or another credentialed procurement portal.
+
+**Completed:** Preserved the prior lifecycle and pursuit-hardening work in local commit `44f67cf`. Fixed bundled provider resolution against the external private workspace, rejected provider-ID collisions, added explainable classification and confidence reasons, canonical URL plus issuer/title/deadline deduplication, source-specific filters, per-source health history, and one-link-per-procurement-row selection. Recorded the Career Ops 1.21 scanner-confidence and coverage-health ports while excluding job-search and community-governance changes. DemandStar remains a manual browsing source; selected URLs or files continue through the existing capture workflow.
+
+**Validation:** All 97 RFP-native tests, parity audit, release/privacy audit, package dry run, doctor, stats, diff check, and generic secret-pattern scan passed. A live dry run completed with no provider errors, rejected informational search results, and identified one current Indiana facilitation solicitation without modifying the pipeline, scan history, or source-health history.
+
 ## 2026-07-17 - Lifecycle routing and contracted-engagement intake
 
 **Objective:** Extend the public concierge beyond pursuit operations while keeping private financial-analysis implementation outside this repository.

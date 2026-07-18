@@ -2,6 +2,12 @@
 
 All notable changes are documented here. This project follows semantic versioning.
 
+## Unreleased
+
+- Fixed bundled provider loading when Consulting Ops runs against an external private workspace.
+- Added explainable discovery confidence and reason codes, canonical and fingerprint deduplication, source-specific filters, per-source health history, and duplicate table-row suppression.
+- Reviewed Career Ops 1.21.0 and ported only its scanner-confidence and source-health concepts.
+
 ## 0.4.0 — 2026-07-16
 
 - Added a persistent external-workspace resolver and `consulting-ops setup` installer.

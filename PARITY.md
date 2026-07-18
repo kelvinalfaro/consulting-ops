@@ -46,8 +46,14 @@ records canonical capability matching and redirect revalidation as acceptance
 criteria for a future evidence-grounded capability-gap analyzer. Career-only
 manifesto and signature automation are intentionally excluded.
 
+The feature-level review of career-ops 1.21.0 is recorded in
+[`docs/CAREER_OPS_1_21_PORT.md`](docs/CAREER_OPS_1_21_PORT.md). Consulting Ops
+ports explainable discovery confidence and persistent source-health tracking,
+while excluding ATS, interview, compensation, CV, manifesto, ledger, and other
+employment- or community-specific features.
+
 ## Command-center acceptance standard
 
 The no-argument skill flow must match career-ops operationally: run doctor and update checks, report readiness, and display the complete consulting-native command menu. Every advertised command must have a CLI route and mode instructions where agent judgment is required. The parity audit checks this surface across all shipped AI adapters.
 
-Discovery separates actionable opportunities from procurement source leads. Only concrete, domain-relevant solicitations enter `Pending`; portal and directory leads are retained under `Source leads`; informational RFP/RFQ articles are rejected. Pipeline processing is scoped strictly to the `Pending` section.
+Discovery separates actionable opportunities from procurement source leads. Only concrete, domain-relevant solicitations enter `Pending`; portal and directory leads are retained under `Source leads`; informational RFP/RFQ articles are rejected. Each classification carries confidence and reason codes, source health is tracked across runs, and pipeline processing remains scoped strictly to the `Pending` section.
