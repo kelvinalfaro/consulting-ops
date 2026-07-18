@@ -19,14 +19,14 @@ The CLI resolves its workspace in this order: `--workspace`, `CONSULTING_OPS_WOR
 
 ## Consulting lifecycle routing
 
-Route by the work's actual stage rather than treating every request as a pursuit:
+Route by the work's actual stage rather than treating every request as a pursuit. Specialized skills are optional enhancements, not installation dependencies. When a named skill is unavailable, use the bundled fallback in `references/standalone-workflows.md` and continue without implying that the missing skill is installed.
 
-1. Initial inquiry, sponsor discovery, or an engagement that is still being shaped: use `consulting-engagement-design`.
+1. Initial inquiry, sponsor discovery, or an engagement that is still being shaped: use `consulting-engagement-design` when installed; otherwise use the inquiry-shaping fallback.
 2. RFP or RFQ discovery, evaluation, pursuit, or tracking: use Consulting Ops and this concierge.
-3. A proposal or statement of work: use `consulting-proposal-sow` while Consulting Ops preserves pursuit evidence and status.
+3. A proposal tied to a solicitation: use `consulting-ops proposal <record>`. For a standalone proposal or SOW, use `consulting-proposal-sow` when installed; otherwise use the bundled SOW fallback.
 4. An accepted agreement before launch: use the engagement-intake workflow in `references/engagement-intake.md`.
-5. An active engagement, reset, handoff, or closeout: use `consulting-engagement-stewardship`.
-6. Management analysis of multiple financial statements, budgets, or reporting files: use the private `analyze-financial-performance` skill when it is installed.
+5. An active engagement, reset, handoff, or closeout: use `consulting-engagement-stewardship` when installed; otherwise use the stewardship fallback.
+6. Financial, business-case, CSV, or direct-communication work outside the RFP engine: use an applicable installed skill when available; otherwise follow the bounded handoffs in the standalone fallback and state what the core cannot do deterministically.
 
 Keep three forms of intake distinct:
 

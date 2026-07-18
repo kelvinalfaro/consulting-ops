@@ -1,6 +1,6 @@
 {
   "name": "consulting-ops",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "AI-agnostic RFP discovery, bid/no-bid, proposal, and consulting opportunity pipeline",
   "private": false,
   "type": "module",

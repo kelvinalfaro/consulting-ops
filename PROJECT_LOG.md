@@ -8,6 +8,10 @@
 
 **Validation:** All 97 RFP-native tests, parity audit, release/privacy audit, package dry run, doctor, stats, diff check, and generic secret-pattern scan passed. A live dry run completed with no provider errors, rejected informational search results, and identified one current Indiana facilitation solicitation without modifying the pipeline, scan history, or source-health history.
 
+**Public sharing and v0.5.0:** Prepared the system for direct GitHub installation and independent use. The bundled concierge now includes standalone fallbacks when the maintainer's optional consulting skills are unavailable; engagement intake, evaluation fixtures, documentation, and growth-assessment output no longer assume Kelvin, OSC, or Alfaro Consulting. Non-Git updates point users back to the public GitHub installer rather than an unpublished npm registry package. Private workspaces remain per-user and outside the repository; DemandStar remains excluded.
+
+**Release validation:** The full gate passed at 100/100 tests, including parity, privacy, and package audits. A clean `0.5.0` tarball install onboarded a fictional firm into an isolated workspace, installed the concierge for portable, Codex, Gemini, and Claude discovery, passed doctor, and completed the capture-to-proposal workflow without touching Kelvin's private workspace.
+
 ## 2026-07-17 - Lifecycle routing and contracted-engagement intake
 
 **Objective:** Extend the public concierge beyond pursuit operations while keeping private financial-analysis implementation outside this repository.

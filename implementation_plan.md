@@ -52,7 +52,7 @@ The reusable architecture of `career-ops` is valuable, but consulting procuremen
 - `reports/`
 - `modes/_company_profile.md` and `modes/_custom.md`
 
-The public repository will ship `.example` or `.template` versions of firm-specific files. Kelvin's Alfaro Consulting content must not be committed to the public template repository unless he explicitly chooses particular material for publication.
+The public repository will ship `.example` or `.template` versions of firm-specific files. Maintainer-private firm content must not be committed unless its owner explicitly chooses particular material for publication.
 
 ## Canonical opportunity model
 

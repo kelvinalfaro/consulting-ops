@@ -6,9 +6,21 @@ An AI-agnostic command center for consulting opportunity discovery, disciplined 
 
 No command submits a proposal. Pricing, legal terms, representations, signatures, and final submission always require human review.
 
-## Install once, call it from any CLI
+## Install from GitHub
 
 Requirements: Node.js 18 or newer and Git.
+
+For a normal user installation:
+
+```powershell
+npm install --global github:kelvinalfaro/consulting-ops
+consulting-ops setup
+consulting-ops doctor --json
+```
+
+`setup` asks where private firm and pursuit data should live, creates or onboards that external workspace, saves it as the default, installs the AI-agnostic `consulting-concierge` skill, and runs the setup doctor. Each user gets an independent private workspace; no maintainer firm data is included.
+
+For a contributor or source checkout:
 
 ```powershell
 git clone https://github.com/kelvinalfaro/consulting-ops.git
@@ -18,7 +30,7 @@ npm link
 consulting-ops setup
 ```
 
-`setup` asks where private firm and pursuit data should live, creates or onboards that external workspace, saves it as the default, installs the AI-agnostic `consulting-concierge` skill, and runs the setup doctor. The cloned repository remains updateable system code; private data is not placed in it.
+The cloned repository remains updateable system code; private data is not placed in it. A downloaded ZIP can run `npm install` followed by `node consulting-ops.mjs setup`, but Git clone or the global GitHub installation is recommended for straightforward updates.
 
 For non-interactive setup, copy and edit `examples/onboarding-answers.example.json`, then run:
 
@@ -29,6 +41,8 @@ consulting-ops setup --workspace <private-folder> --answers <file> --yes --agent
 The default `--agent portable` installs to `~/.agents/skills`, which Gemini CLI also discovers. `--agent all` additionally installs native user-scope copies for Codex, Gemini CLI, and Claude Code. Use `portable`, `codex`, `gemini`, or `claude` for a single target.
 
 `npm link` makes `consulting-ops` available in PowerShell, Command Prompt, Bash, zsh, and AI coding-tool terminals. From a source checkout, use `node consulting-ops.mjs <command>` or `npm run <script> -- <arguments>`; do not rely on `npx` to resolve the current checkout.
+
+Git checkouts update through `consulting-ops update apply`. A global GitHub installation returns the exact GitHub reinstall command because it has no repository metadata to pull safely.
 
 To create a new private workspace from an already installed copy:
 
@@ -139,7 +153,9 @@ Discovery records explainable classifications and confidence reasons, canonicali
 
 ## Use with AI coding assistants
 
-The scripts and Markdown/YAML contracts are the product API; no AI subscription is required. `consulting-concierge` is the recommended conversational product surface, while the CLI remains the deterministic engine. The skill follows the open Agent Skills layout and is usable by Gemini CLI through its `.agents/skills` alias; native adapters are also included for supported agents.
+The scripts and Markdown/YAML contracts are the product API; no AI subscription is required. `consulting-concierge` is the recommended conversational product surface, while the CLI remains the deterministic engine. The skill follows the open Agent Skills layout and is usable by Gemini CLI through its `.agents/skills` alias; native adapters are also included for supported agents. The skill is not a standalone replacement for the CLI: it calls the installed `consulting-ops` command.
+
+Specialized skills named by the concierge are optional enhancements. When they are absent, the bundled standalone workflows cover inquiry shaping, SOW framing, active-engagement stewardship, bounded non-core analysis intake, and client communication without claiming capabilities the core does not provide.
 
 From a source checkout, invoke the direct router with `node consulting-ops.mjs`. An empty invocation performs the readiness and update checks in one process and prints the concise command center; `node consulting-ops.mjs more` prints the full command reference.
 

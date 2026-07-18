@@ -14,14 +14,15 @@
 
 ## Routes beyond the pursuit engine
 
-- Initial inquiry and discovery: `consulting-engagement-design`.
-- Proposal or SOW drafting and review: `consulting-proposal-sow`.
+- These routes must not block when optional skills are absent. Use the named skill when installed; otherwise use the matching section in `standalone-workflows.md`.
+- Initial inquiry and discovery: optional `consulting-engagement-design`; fallback `Shape an inquiry`.
+- Solicitation response: `consulting-ops proposal <record>`. Standalone proposal or SOW: optional `consulting-proposal-sow`; fallback `Shape a standalone proposal or SOW`.
 - Accepted agreement and pre-launch readiness: follow `engagement-intake.md`.
-- Active engagement, reset, handoff, or closeout: `consulting-engagement-stewardship`.
-- One general-purpose CSV: `csv-data-summarizer`.
-- Multiple financial statements, budgets, management reports, or readable financial PDFs: private `analyze-financial-performance`, when installed.
-- ROI, NPV, investment justification, option economics, or sensitivity analysis: `consulting-business-case`; it may use completed financial-analysis outputs as evidence.
-- Client requests, sponsor updates, or other direct outward-facing drafts: `direct-communication-memo`.
+- Active engagement, reset, handoff, or closeout: optional `consulting-engagement-stewardship`; fallback `Steward an active engagement`.
+- One general-purpose CSV: optional `csv-data-summarizer`; fallback `Bound non-core analysis`.
+- Multiple financial statements, budgets, management reports, or readable financial PDFs: optional `analyze-financial-performance`; fallback `Bound non-core analysis`.
+- ROI, NPV, investment justification, option economics, or sensitivity analysis: optional `consulting-business-case`; fallback `Bound non-core analysis`.
+- Client requests, sponsor updates, or other direct outward-facing drafts: optional `direct-communication-memo`; fallback `Draft a bounded client communication`.
 
 Read the command's generated source references and unresolved-item lists before interpreting results. Use `consulting-ops more` only when no concise route fits.
 

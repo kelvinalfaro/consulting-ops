@@ -1,13 +1,13 @@
 {
-  "version": 1,
+  "version": 2,
   "routes": [
-    {"id": "osc-discovery", "prompt": "Help frame a new OSC sponsor inquiry before we define the work.", "expected": "consulting-engagement-design"},
-    {"id": "alfaro-pursuit", "prompt": "Evaluate this Alfaro Consulting RFQ and decide whether to bid.", "expected": "Consulting Ops"},
+    {"id": "osc-discovery", "prompt": "Help frame a new sponsor inquiry before we define the work.", "expected": "consulting-engagement-design", "fallback": "Shape an inquiry"},
+    {"id": "external-pursuit", "prompt": "Evaluate this consulting RFQ and decide whether to bid.", "expected": "Consulting Ops"},
     {"id": "signed-sow", "prompt": "The SOW is signed; establish the engagement folder, evidence inventory, access gaps, and kickoff readiness.", "expected": "engagement-intake.md"},
-    {"id": "active-reset", "prompt": "This active engagement is drifting and needs a sponsor reset.", "expected": "consulting-engagement-stewardship"},
-    {"id": "single-csv", "prompt": "Summarize this one general CSV.", "expected": "csv-data-summarizer"},
-    {"id": "multi-file-financials", "prompt": "Analyze these statements, budget files, and management reports.", "expected": "analyze-financial-performance"},
-    {"id": "investment-case", "prompt": "Build ROI, NPV, and sensitivity for the proposed investment.", "expected": "consulting-business-case"},
-    {"id": "sponsor-update", "prompt": "Draft a sponsor update explaining the supported finding and next action.", "expected": "direct-communication-memo"}
+    {"id": "active-reset", "prompt": "This active engagement is drifting and needs a sponsor reset.", "expected": "consulting-engagement-stewardship", "fallback": "Steward an active engagement"},
+    {"id": "single-csv", "prompt": "Summarize this one general CSV.", "expected": "csv-data-summarizer", "fallback": "Bound non-core analysis"},
+    {"id": "multi-file-financials", "prompt": "Analyze these statements, budget files, and management reports.", "expected": "analyze-financial-performance", "fallback": "Bound non-core analysis"},
+    {"id": "investment-case", "prompt": "Build ROI, NPV, and sensitivity for the proposed investment.", "expected": "consulting-business-case", "fallback": "Bound non-core analysis"},
+    {"id": "sponsor-update", "prompt": "Draft a sponsor update explaining the supported finding and next action.", "expected": "direct-communication-memo", "fallback": "Draft a bounded client communication"}
   ]
 }

@@ -5,8 +5,8 @@ Use this workflow after a proposal or SOW has been accepted and before substanti
 ## Establish the working surface
 
 1. Confirm the authoritative engagement folder before writing files.
-2. For OSC work, inspect the established OSC portfolio and continue the matching engagement folder and its folder conventions.
-3. For Alfaro Consulting work, use a confirmed existing client folder. If no client folder is confirmed, ask Kelvin where the engagement belongs rather than inventing a universal Alfaro root.
+2. Inspect the user's established portfolio or client root and continue the matching engagement folder and its conventions.
+3. If no authoritative folder is configured or confirmed, ask where the engagement belongs rather than inventing a universal root.
 4. Read the accepted SOW or other charter, then the nearest applicable `AGENTS.md` and the engagement-level `PROJECT_LOG.md` when present.
 
 ## Build the intake record
