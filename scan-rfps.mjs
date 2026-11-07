@@ -398,6 +398,10 @@ export async function scan(config, options = {}) {
 
 async function main() {
   const args = process.argv.slice(2);
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log('Usage: consulting-ops scan [--config path] [--dry-run] [--include-rejected]');
+    return;
+  }
   const configIndex = args.indexOf('--config');
   const configPath = resolve(configIndex >= 0 && args[configIndex + 1] ? args[configIndex + 1] : DEFAULT_CONFIG);
   if (!existsSync(configPath)) {
