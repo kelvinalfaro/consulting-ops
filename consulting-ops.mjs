@@ -83,14 +83,14 @@ function commandCenter(args, workspace) {
   else process.stdout.write(renderCommandCenter(status));
 }
 
-function run(script, args, workspace = process.cwd()) {
+function run(script, args, workspace) {
   const path = resolve(root, script);
   if (!existsSync(path)) {
     console.error(`Mode is planned but not installed in this version: ${script}`);
     process.exit(2);
   }
   const result = spawnSync(process.execPath, [path, ...args], {
-    cwd: workspace, stdio: 'inherit', env: { ...process.env, CONSULTING_OPS_WORKSPACE: workspace },
+    cwd: workspace, stdio: 'inherit', env: workspace ? { ...process.env, CONSULTING_OPS_WORKSPACE: workspace } : process.env,
   });
   if (result.error) throw result.error;
   process.exit(result.status ?? 1);
@@ -108,7 +108,7 @@ function main() {
   const raw = process.argv.slice(2);
   const [rawMode, ...rawArgs] = raw;
   if (rawMode === 'setup') return run('setup.mjs', rawArgs);
-  if (rawMode === 'init') return run('setup.mjs', ['--workspace', rawArgs[0] ?? 'consulting-ops-workspace', ...rawArgs.slice(1)]);
+  if (rawMode === 'init') return run('setup.mjs', rawArgs.length ? ['--workspace', ...rawArgs] : []);
   const { workspace: explicit, args: cleaned } = extractWorkspaceArgs(raw);
   const workspace = resolveWorkspace({ explicit, env: process.env });
   const [mode, ...args] = cleaned;

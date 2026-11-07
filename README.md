@@ -18,7 +18,7 @@ consulting-ops setup
 consulting-ops doctor --json
 ```
 
-`setup` asks where private firm and pursuit data should live, creates or onboards that external workspace, saves it as the default, installs the AI-agnostic `consulting-concierge` skill, and runs the setup doctor. Each user gets an independent private workspace; no maintainer firm data is included.
+`setup` asks where private firm and pursuit data should live, creates or onboards that external workspace, saves it as the default, installs the AI-agnostic `consulting-concierge` skill, and runs the setup doctor. On another computer, mount the same shared drive and select the existing workspace, or run `consulting-ops setup --workspace "<path>"`. The path is saved locally and your existing workspace files are preserved.
 
 For a contributor or source checkout:
 
